@@ -44,7 +44,9 @@ def stocks(request):
             y_axis_property = "Close"
             
             data = s.fetch_data(ticker, start_date, end_date)
-            p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True)
+            graph = p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
+            
+            return render(request, 'stocks.html', {'graph': graph})
         
     return render(request, 'stocks.html')
 

@@ -2,42 +2,63 @@
 
 {% block content %}
 
-<h1><u>Stocks</u></h1>
+<h1><u>Stocks Info</u></h1>
 
 <br/><br/><br/>
+<table>
 
-<div class="form-container">
+    <tr>
 
-    <form method="post" class="forms">
+        <td>
 
-        {% csrf_token %}
+            <div class="form-container">
 
+                <form method="post" class="forms">
+            
+                    {% csrf_token %}
+            
+            
+                    <div class="mb-3">
+            
+                        <label for="stock_sym" class="form-label">Stock Symbol: </label>
+            
+                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+            
+                    </div>
+            
+                    <div class="mb-3">
+            
+                        <label for="date" class="form-label">between dates: </label>
+            
+                        <input type="date" id="date_start" name="date_start" value="2024-01-01" />
+            
+                        <input type="date" id="date_end" name="date_end" value="2024-12-06" />
+            
+                    </div>
+            
+                    <br/>
+            
+                    <button type="submit" class="btn btn-primary">Get Stock</button>
+            
+                </form>
+            
+                </div>
 
-        <div class="mb-3">
+        </td>
 
-            <label for="stock_sym" class="form-label">Stock Symbol: </label>
+        <td>
 
-            <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+            {% if graph %}
 
-        </div>
+                <img src="data:image/png;base64,{{ graph }}" alt="Stock Plot">
 
-        <div class="mb-3">
+            {% endif %}
 
-            <label for="date" class="form-label">between dates: </label>
+        </td>
 
-            <input type="date" id="date_start" name="date_start" value="2024-01-01" />
+    </tr>
 
-            <input type="date" id="date_end" name="date_end" value="2024-12-06" />
-
-        </div>
-
-        <br/>
-
-        <button type="submit" class="btn btn-primary">Get Stock</button>
-
-    </form>
-
-    </div>
+</table>
 
 </body>
 {% endblock %}
