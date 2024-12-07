@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1><u>Stocks</u></h1>
+
+<br/><br/><br/>
+
+<div class="form-container">
+
+    <form method="post" class="forms">
+
+        {% csrf_token %}
+
+
+        <div class="mb-3">
+
+            <label for="stock_sym" class="form-label">Stock Symbol: </label>
+
+            <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label for="date" class="form-label">between dates: </label>
+
+            <input type="date" id="date_start" name="date_start" value="2024-01-01" />
+
+            <input type="date" id="date_end" name="date_end" value="2024-12-06" />
+
+        </div>
+
+        <br/>
+
+        <button type="submit" class="btn btn-primary">Get Stock</button>
+
+    </form>
+
+    </div>
+
+</body>
+{% endblock %}

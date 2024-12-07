@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
+from .plotter import Plotter
+from .stock_data_query import StockData
+from datetime import datetime, timedelta
 
 # TO-DO 1.1: create a settings page, which the dark_mode will be toggled from
 # TO-DO 1.2: on every login/logout - take the current value of dark_theme (session variable) and update in db, for persistence
@@ -19,6 +22,32 @@ def home(request):
 
 def about(request):
     return render(request, 'about.html')
+
+@login_required
+def stocks(request):
+    if request.method == 'POST':
+        
+        # init facade:
+        p = Plotter()
+        s = StockData()
+        
+        ticker = request.POST.get('stock_sym', False)
+        start_date = request.POST.get('date_start', False)
+        end_date = request.POST.get('date_end', False)
+        
+        # validate dates
+        dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
+        
+        if ticker and start_date and end_date and dates_valid:
+            
+            x_axis_property = "Date"
+            y_axis_property = "Close"
+            
+            data = s.fetch_data(ticker, start_date, end_date)
+            p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True)
+        
+    return render(request, 'stocks.html')
+
 
 @login_required
 def my_profile(request):
