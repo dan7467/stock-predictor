@@ -48,6 +48,22 @@ def stocks(request):
             
             return render(request, 'stocks.html', {'graph': graph})
         
+    # # TO-DO: save stock to My Stocks:
+    # elif request.method == 'PATCH':
+    #     stock_symbol = request.POST.get('stock_sym', False)
+        
+    #     if stock_symbol:
+    #         try:
+    #             user = User.objects.create_user(username=username, password=password, email=email)
+    #             user.save()
+    #             messages.success(request, 'Registration successful! Please log in.')
+    #             return redirect('login')
+    #         except:
+    #             messages.error(request, 'Username already exists.')
+                
+    #     else:
+    #         messages.error(request, 'No stock symbol was entered!')
+        
     return render(request, 'stocks.html')
 
 
