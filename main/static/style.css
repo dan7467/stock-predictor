@@ -1,0 +1,85 @@
+:root {
+    --bg: #C1BAA1;
+    --navbar: #A59D84; 
+    --text: #black;
+}
+
+html {
+    background-color: var(--bg);
+}
+
+#main_site_buttons {
+    color: var(--text);
+}
+
+#body {
+    background-color: inherit;
+    text-align: center;
+    color: var(--text);
+}
+
+a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
+    color: var(--text);
+}
+
+#navbar {
+    background-color: var(--navbar);
+    font-size: 20px;
+}
+
+#main_container {
+    background-color: inherit;
+}
+
+#navbar_container {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+#logo {
+    font-size: 32px;
+    color: var(--text);
+}
+
+#table_row_header {
+    width: 200px;
+    max-width: 200px;
+}
+
+.form-container {
+    text-align: center; /* Centers inline elements */
+}
+
+.form-container form {
+    display: inline-block; /* Makes the form itself a block, centered within text-align */
+    text-align: left; /* Aligns form contents properly inside */
+}
+
+input {
+    width: 300px; /* Adjust the width as needed */
+    margin-bottom: 10px; /* Adds spacing between input fields */
+    padding: 10px; /* Adds padding for better appearance */
+    display: block; /* Ensures each input field takes up a full line */
+    margin-left: auto; /* Centers input inside the form */
+    margin-right: auto;
+}
+
+#user_menu {
+    margin-right: 40px;
+}
+
+/* .centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
+/* TO-DO 2: fix fields of forms to be less wide - */
+
+/* .form-control {
+    max-width: 300px;
+}
+
+.forms {
+    align-items: center;
+} */

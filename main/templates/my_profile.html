@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+
+<h2>My Profile</h2>
+
+<br/>
+
+    {% if user.is_authenticated %}
+
+        <table class="table table-bordered">
+
+            <tr>
+
+                <td id="table_row_header">
+                    
+                    <b>
+
+                        Username
+
+                    </b>
+
+                </td>
+
+                <td>
+                    
+                    {{ user.username }}
+                
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td id="table_row_header">
+                    
+                    <b>
+
+                        E-mail
+
+                    </b>
+
+                </td>
+
+                <td>
+                    
+                    {{ user.email }}
+                
+                </td>
+
+            </tr>
+
+        </table>
+
+    {% else %}
+
+        <h3>to see your profile - simply <a href="{% url 'login' %}">log in</a>.</h3>
+
+        <br/>
+
+        <h4>new to this website? <a href="{% url 'register' %}">register</a> now!</h4>
+
+    {% endif %}
+
+{% endblock %}

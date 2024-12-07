@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+    var i = 0;
+    var j = 0;
+    const txt = [ 'This is a dockerized Python Django app, ', 'integrated with a PostgreSQL database.', 'This app was created by DanBD,', 'Stay tuned.'];
+    const total_lines = txt.length;
+    const speed = 40;
+    
+    function typeWriter() {
+        if (i < total_lines && j < txt[i].length) {
+            document.getElementById("type_animation").innerHTML += txt[i].charAt(j);
+            j++;
+            setTimeout(typeWriter, speed);
+        }
+        else if (i < total_lines) {
+            i++;
+            j = 0;
+            document.getElementById("type_animation").innerHTML += `<br/>`;
+            setTimeout(typeWriter, speed);
+        }
+    }
+</script>
+
+<body onload="typeWriter()">
+
+<h1><u>About the app</u></h1>
+
+<br/><br/><br/>
+
+<code id="type_animation" style="font-size: 34px; color: var(--text);"></code>
+
+</body>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+    let i = 0;
+    let j = 0;
+    let username;
+    const users_txt = ['', 'New features are added every day!', '', 'E N J O Y .'];
+    const guests_txt = ['Welcome!', "We see that you're new to this place,", 'Or maybe just forgot to log in...', '', 'To get full functionality,', 'Register and Sign in! :)'];
+    const speed = 40;
+    let chosen_text;
+    function setTypewriteText(isGuest) {
+        chosen_text = [users_txt, guests_txt][isGuest ? 1 : 0];
+        if (!(isGuest)) {
+            users_txt[0] = "Hello there, {{ user.username }}!";
+        }
+        typeWriter();
+    }
+    function typeWriter() {
+        let total_lines = chosen_text.length;
+        if (i < total_lines && j < chosen_text[i].length) {
+            document.getElementById("type_animation").innerHTML += chosen_text[i].charAt(j);
+            j++;
+            setTimeout(typeWriter, speed);
+        }
+        else if (i < total_lines) {
+            i++;
+            j = 0;
+            document.getElementById("type_animation").innerHTML += `<br/>`;
+            setTimeout(typeWriter, speed);
+        }
+    }
+</script>
+
+
+{% if user.is_authenticated %}
+<body onload="setTypewriteText(false)">
+{% else %}
+<body onload="setTypewriteText(true)">
+{% endif %}
+
+
+
+<h1><u>Home</u></h1>
+
+<br/><br/><br/>
+
+<code id="type_animation" style="font-size: 34px; color: var(--text);"></code>
+
+</body>
+{% endblock %}
