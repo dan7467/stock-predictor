@@ -1,5 +1,12 @@
 # Django==4.2
 # psycopg2-binary==2.9.8
+autogluon==1.2
+autogluon.common==1.2
+autogluon.core==1.2
+autogluon.features==1.2
+autogluon.multimodal==1.2
+autogluon.tabular==1.2
+autogluon.timeseries==1.2
 asgiref==3.8.1
 beautifulsoup4==4.12.3
 certifi==2024.8.30

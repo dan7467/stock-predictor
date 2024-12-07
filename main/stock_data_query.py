@@ -5,6 +5,10 @@ class StockData:
     def fetch_data(self, ticker, start_date, end_date):
         return yf.download(ticker, start=start_date, end=end_date)
     
+    # fetch maximum data on stock to train Tabular Predictor (still not ready)
+    def fetch_all_stock_data(self, ticker):
+        return yf.download(ticker, period="max", auto_adjust=False)
+    
     # gather data from yahoo finance:
     def fetch_data_as_list(self, ticker, start_date, end_date, x_axis_property, y_axis_property):
         data_dict_of_two_lists = self.fetch_data(ticker, start_date, end_date)[y_axis_property].reset_index().to_dict(orient='list')
