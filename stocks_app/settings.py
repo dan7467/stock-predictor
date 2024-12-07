@@ -79,7 +79,7 @@ DB_CREDENTIALS = get_credentials('postgresql')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myapp',
+        'NAME': 'myapp',  # TO-DO: create a new stockApp database 
         'USER': DB_CREDENTIALS['db_user'],
         'PASSWORD': DB_CREDENTIALS['db_pass'],
         'HOST': 'localhost',
