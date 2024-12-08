@@ -30,9 +30,7 @@ def stocks(request):
         # Check if this is a PATCH simulation
         if request.POST.get('_method') == 'PATCH':
             stock_symbol = request.POST.get('_symbol', False)
-            profile = CustomUser.objects.get(username=request.user.username)
-            print("Inserting", stock_symbol, "to", profile)
-            
+            profile = CustomUser.objects.get(username=request.user.username)            
             if stock_symbol:
                 try:
                     profile.my_stocks.append(stock_symbol)
@@ -42,7 +40,7 @@ def stocks(request):
                     messages.error(request, f"Could not update stock: {e}")
             else:
                 messages.error(request, 'No stock symbol was entered!')
-            return render(request, 'stocks.html')  # Re-render the same page
+            return render(request, 'stocks.html', {'stock_name': stock_symbol})  # Re-render the same page
         
         # init facade:
         p = Plotter()
@@ -72,6 +70,18 @@ def stocks(request):
 
 @login_required
 def my_profile(request):
+    if request.method == 'POST':
+        if request.POST.get('_method', False) == 'DELETE':
+            stock_symbol = request.POST.get('_stock_sym', False)
+            if stock_symbol:
+                profile = CustomUser.objects.get(username=request.user.username)
+                try:
+                    profile.my_stocks.remove(stock_symbol)
+                    profile.save()
+                    messages.success(request, f"Stock {stock_symbol} removed from 'My Stocks'")
+                    return render(request, 'my_profile.html', {'deleted': stock_symbol})
+                except Exception as e:
+                    messages.error(request, f"Could not update stock: {e}")
     return render(request, 'my_profile.html')
 
 def register_view(request):

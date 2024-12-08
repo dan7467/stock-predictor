@@ -66,12 +66,28 @@
 
                 <td>
 
-                    {% for stock in user.my_stocks %}
-                    
-                        {{ stock }}
-
-                    {% endfor %}
-                
+                    <br/>
+                    <form method="post" class="forms">
+                        <input type="hidden" id="_method" name="_method" value="DELETE">
+                        <input type="hidden" id="_stock_sym" name="_stock_sym">
+                        {% csrf_token %}
+                        {% for stock in user.my_stocks %}
+                            {% if deleted %}
+                                {% if deleted == stock %}
+                                {% else %}
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-primary">{{ stock }}</button>
+                                    <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                </div><br/><br/>
+                                {% endif %}
+                            {% else %}
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-primary">{{ stock }}</button>
+                                    <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                </div><br/><br/>
+                            {% endif %}
+                        {% endfor %}
+                    </form>
                 </td>
 
             </tr>
@@ -87,5 +103,15 @@
         <h4>new to this website? <a href="{% url 'register' %}">register</a> now!</h4>
 
     {% endif %}
+
+    <script>
+        function remove_from_my_stocks(stock_sym) {
+            document.getElementById('_stock_sym').value = stock_sym;
+            document.getElementById('del_'+stock_sym+'_btn').innerHTML = 'Loading...';
+            //setTimeout(() => {
+            //    location.reload();
+            //}, 2000);
+        }
+    </script>
 
 {% endblock %}
