@@ -26,12 +26,12 @@ def about(request):
 
 @login_required
 def stocks(request):
+    profile = CustomUser.objects.get(username=request.user.username)   
     if request.method == 'POST':
         # Check if this is a PATCH simulation
         if request.POST.get('_method') == 'PATCH':
-            stock_symbol = request.POST.get('_symbol', False)
-            profile = CustomUser.objects.get(username=request.user.username)            
-            if stock_symbol:
+            stock_symbol = request.POST.get('_symbol', False)         
+            if stock_symbol and stock_symbol not in profile.my_stocks:
                 try:
                     profile.my_stocks.append(stock_symbol)
                     profile.save()
@@ -40,7 +40,7 @@ def stocks(request):
                     messages.error(request, f"Could not update stock: {e}")
             else:
                 messages.error(request, 'No stock symbol was entered!')
-            return render(request, 'stocks.html', {'stock_name': stock_symbol})  # Re-render the same page
+            return render(request, 'stocks.html', {'stock_name': stock_symbol, 'my_stocks': profile.my_stocks})  # Re-render the same page
         
         # init facade:
         p = Plotter()
@@ -55,6 +55,8 @@ def stocks(request):
         # validate dates
         dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
         
+        print('\n\nticker = ',ticker,'\n\n')
+        
         if ticker and start_date and end_date and dates_valid:
             
             x_axis_property = "Date"
@@ -63,9 +65,9 @@ def stocks(request):
             data = s.fetch_data(ticker, start_date, end_date)
             graph = p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
             
-            return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker})
+            return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker, 'my_stocks': profile.my_stocks})
         
-    return render(request, 'stocks.html')
+    return render(request, 'stocks.html', {'my_stocks': profile.my_stocks})
 
 
 @login_required

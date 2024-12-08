@@ -22,15 +22,21 @@
             
                         <label for="stock_sym" class="form-label">Stock Symbol: </label>
                         {% if stock_name %}
-
-                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" required>
+                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" list="my_stocks_list" required>
 
                         {% else %}
 
-                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
         
                         {% endif %}
                         
+                        <datalist id="my_stocks_list">
+                            {% if my_stocks %}
+                                {% for my_stock in my_stocks %}
+                                    <option value="{{ my_stock }}">
+                                {% endfor %}
+                            {% endif %}
+                        </datalist>
             
                     </div>
             
