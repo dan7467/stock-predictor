@@ -1,3 +1,6 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# All of the schemas are in PostgreSQL (visible from pgAdmin, or from psql by queries)
+# extending the existing data model:
+class CustomUser(AbstractUser):
+    my_stocks = models.JSONField(default=list)  # Stores a list of stock symbols

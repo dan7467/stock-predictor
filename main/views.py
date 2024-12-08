@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from .plotter import Plotter
 from .stock_data_query import StockData
 from datetime import datetime, timedelta
+from .models import CustomUser
 
 # TO-DO 1.1: create a settings page, which the dark_mode will be toggled from
 # TO-DO 1.2: on every login/logout - take the current value of dark_theme (session variable) and update in db, for persistence
@@ -26,6 +27,22 @@ def about(request):
 @login_required
 def stocks(request):
     if request.method == 'POST':
+        # Check if this is a PATCH simulation
+        if request.POST.get('_method') == 'PATCH':
+            stock_symbol = request.POST.get('_symbol', False)
+            profile = CustomUser.objects.get(username=request.user.username)
+            print("Inserting", stock_symbol, "to", profile)
+            
+            if stock_symbol:
+                try:
+                    profile.my_stocks.append(stock_symbol)
+                    profile.save()
+                    messages.success(request, f"Stock {stock_symbol} added to 'My Stocks'!")
+                except Exception as e:
+                    messages.error(request, f"Could not update stock: {e}")
+            else:
+                messages.error(request, 'No stock symbol was entered!')
+            return render(request, 'stocks.html')  # Re-render the same page
         
         # init facade:
         p = Plotter()
@@ -50,22 +67,6 @@ def stocks(request):
             
             return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker})
         
-    # # TO-DO: save stock to My Stocks:
-    # elif request.method == 'PATCH':
-    #     stock_symbol = request.POST.get('stock_sym', False)
-        
-    #     if stock_symbol:
-    #         try:
-    #             user = User.objects.create_user(username=username, password=password, email=email)
-    #             user.save()
-    #             messages.success(request, 'Registration successful! Please log in.')
-    #             return redirect('login')
-    #         except:
-    #             messages.error(request, 'Username already exists.')
-                
-    #     else:
-    #         messages.error(request, 'No stock symbol was entered!')
-        
     return render(request, 'stocks.html')
 
 
@@ -83,7 +84,12 @@ def register_view(request):
         
         if password == confirm_password:
             try:
-                user = User.objects.create_user(username=username, password=password, email=email)
+                user = CustomUser.objects.create_user(
+                    username=username,
+                    password=password,
+                    email=email,
+                    my_stocks=[]
+                )
                 user.save()
                 messages.success(request, 'Registration successful! Please log in.')
                 return redirect('login')

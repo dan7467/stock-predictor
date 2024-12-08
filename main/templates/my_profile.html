@@ -52,6 +52,30 @@
 
             </tr>
 
+            <tr>
+
+                <td id="table_row_header">
+                    
+                    <b>
+
+                        My Stocks
+
+                    </b>
+
+                </td>
+
+                <td>
+
+                    {% for stock in user.my_stocks %}
+                    
+                        {{ stock }}
+
+                    {% endfor %}
+                
+                </td>
+
+            </tr>
+
         </table>
 
     {% else %}

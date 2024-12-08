@@ -52,8 +52,11 @@
             
                 </div>
                 <br/>
-                <form method="patch" class="forms">
-                    <button type="submit" style="visibility: hidden;" class="btn btn-secondary">Save to 'My Stocks'</button>
+                <form method="post" class="forms">
+                    {% csrf_token %}
+                    <input type="hidden" name="_method" value="PATCH">
+                    <input type="hidden" name="_symbol" id="_symbol" value="PATCH">
+                    <button type="submit" onclick="update_name()" class="btn btn-secondary">Save to 'My Stocks'</button>
                 </form>
 
         </td>
@@ -77,6 +80,9 @@
     function plot() {
         document.getElementById('stock_form').submit();
         document.getElementById('loader_text').style.visibility = 'visible';
+    }
+    function update_name() {
+        document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
     }
 </script>
 

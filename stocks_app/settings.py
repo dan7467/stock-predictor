@@ -87,6 +87,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'main.CustomUser'  # change to stocks_app if doesn't work
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
