@@ -9,6 +9,9 @@ from .stock_data_query import StockData
 from datetime import datetime, timedelta
 from .models import CustomUser
 
+stock_data_handler = StockData()
+graph_plot_handler = Plotter()
+
 # TO-DO 1.1: create a settings page, which the dark_mode will be toggled from
 # TO-DO 1.2: on every login/logout - take the current value of dark_theme (session variable) and update in db, for persistence
 @login_required
@@ -28,10 +31,10 @@ def about(request):
 def stocks(request):
     profile = CustomUser.objects.get(username=request.user.username)   
     if request.method == 'POST':
-        # Check if this is a PATCH simulation
+        # if this is a PATCH simulation - it is merely a stock saving to My Stocks
         if request.POST.get('_method') == 'PATCH':
             stock_symbol = request.POST.get('_symbol', False)         
-            if stock_symbol and stock_symbol not in profile.my_stocks:
+            if stock_symbol and stock_symbol not in profile.my_stocks and stock_data_handler.check_if_symbol_exists(stock_symbol):
                 try:
                     profile.my_stocks.append(stock_symbol)
                     profile.save()
@@ -42,9 +45,7 @@ def stocks(request):
                 messages.error(request, 'No stock symbol was entered!')
             return render(request, 'stocks.html', {'stock_name': stock_symbol, 'my_stocks': profile.my_stocks})  # Re-render the same page
         
-        # init facade:
-        p = Plotter()
-        s = StockData()
+        # Plot stock data based on user inputs:
         
         # TO-DO: implement cache such that if range was thinned down (new_date_start >= old _date_start and new_date_end <= old_date_end),
         #           then we use the already retrieved info from yf instead of re-calling it
@@ -55,15 +56,13 @@ def stocks(request):
         # validate dates
         dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
         
-        print('\n\nticker = ',ticker,'\n\n')
-        
         if ticker and start_date and end_date and dates_valid:
             
             x_axis_property = "Date"
             y_axis_property = "Close"
             
-            data = s.fetch_data(ticker, start_date, end_date)
-            graph = p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
+            data = stock_data_handler.fetch_data(ticker, start_date, end_date)
+            graph = graph_plot_handler.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
             
             return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker, 'my_stocks': profile.my_stocks})
         

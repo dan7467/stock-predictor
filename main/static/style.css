@@ -4,6 +4,18 @@
     --text: #black;
 }
 
+/* overriding bootstrap btns: */
+
+/* .btn.btn-primary,
+.btn.btn-primary:hover,
+.btn.btn-primary:focus,
+.btn.btn-primary:active,
+.btn.btn-primary.active {
+    color: #ffffff;
+    background-color: pink;
+    border-color: pink;
+} */
+
 html {
     background-color: var(--bg);
 }

@@ -1,4 +1,5 @@
 import yfinance as yf
+import pandas as pd
 
 class StockData:
     
@@ -8,6 +9,10 @@ class StockData:
     # fetch maximum data on stock to train Tabular Predictor (still not ready)
     def fetch_all_stock_data(self, ticker):
         return yf.download(ticker, period="max", auto_adjust=False)
+    
+    def check_if_symbol_exists(self, ticker):
+        data = self.fetch_all_stock_data(ticker)
+        return len(data) != 0 and not (data is pd.DataFrame and data.empty)
     
     # gather data from yahoo finance:
     def fetch_data_as_list(self, ticker, start_date, end_date, x_axis_property, y_axis_property):
