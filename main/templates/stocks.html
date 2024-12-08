@@ -21,8 +21,16 @@
                     <div class="mb-3">
             
                         <label for="stock_sym" class="form-label">Stock Symbol: </label>
-            
-                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+                        {% if stock_name %}
+
+                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" required>
+
+                        {% else %}
+
+                            <input type="text" class="form-control" id="stock_sym" name="stock_sym" required>
+        
+                        {% endif %}
+                        
             
                     </div>
             
@@ -47,7 +55,7 @@
                 </div>
                 <br/>
                 <form method="patch" class="forms">
-                    <button type="submit" class="btn btn-secondary">Save to 'My Stocks'</button>
+                    <button type="submit" style="visibility: hidden;" class="btn btn-secondary">Save to 'My Stocks'</button>
                 </form>
 
         </td>

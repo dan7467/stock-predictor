@@ -46,7 +46,7 @@ def stocks(request):
             data = s.fetch_data(ticker, start_date, end_date)
             graph = p.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
             
-            return render(request, 'stocks.html', {'graph': graph})
+            return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker})
         
     # # TO-DO: save stock to My Stocks:
     # elif request.method == 'PATCH':

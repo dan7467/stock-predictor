@@ -4,7 +4,7 @@ import yfinance as yf
 
 class Predictor:
     
-    def __init__(self, train_data):
+    def __init__(self, train_data):  # consider adding more features for better tabular regression, like season, wars per year, etc.
         self.train_data = pd.DataFrame(train_data, columns=["timestamp", "price"])
         subsample_size = 5000
         if subsample_size is not None and subsample_size < len(self.train_data):
@@ -30,7 +30,7 @@ class Predictor:
             problem_type=problem_type,
         )
     
-    def fit(self, train_data, label):
+    def fit(self, train_data, label):  # consider adding more features for better tabular regression, like season, wars per year, etc.
         self.predictor.fit(
             train_data=self.train_data,
             hyperparameters=self.hyperparameters,
@@ -40,7 +40,7 @@ class Predictor:
         )
         
 
-    def predict(self, test_data):
+    def predict(self, test_data):  # consider adding more features for better tabular regression, like season, wars per year, etc.
         # self.test_data = pd.DataFrame(test_data, columns=["timestamp", "price"])
         return self.predictor.predict(test_data)
 
