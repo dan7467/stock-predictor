@@ -31,6 +31,8 @@ def stocks(request):
         p = Plotter()
         s = StockData()
         
+        # TO-DO: implement cache such that if range was thinned down (new_date_start >= old _date_start and new_date_end <= old_date_end),
+        #           then we use the already retrieved info from yf instead of re-calling it
         ticker = request.POST.get('stock_sym', False)
         start_date = request.POST.get('date_start', False)
         end_date = request.POST.get('date_end', False)

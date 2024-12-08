@@ -13,7 +13,7 @@
 
             <div class="form-container">
 
-                <form method="post" class="forms">
+                <form id="stock_form" method="post" class="forms">
             
                     {% csrf_token %}
             
@@ -38,15 +38,13 @@
             
                         <label for="date" class="form-label">between dates: </label>
             
-                        <input type="date" id="date_start" name="date_start" value="2024-01-01" />
+                        <input type="date" onchange="plot()" id="date_start" name="date_start" value="2024-01-01" />
             
-                        <input type="date" id="date_end" name="date_end" value="2024-12-06" />
+                        <input type="date" onchange="plot()" id="date_end" name="date_end" value="2024-12-06" />
             
                     </div>
             
                     <br/>
-                    {% comment %} TO-DO: fix this lousy html {% endcomment %}
-                    <button type="submit" class="btn btn-primary">Get Stock</button>
             
                 </form>
 
@@ -64,6 +62,7 @@
 
             {% if graph %}
 
+                <h2 id="loader_text" for="loader_text" style="visibility: hidden;" class="form-label">Loading info...</h2>
                 <img src="data:image/png;base64,{{ graph }}" alt="Stock Plot">
 
             {% endif %}
@@ -73,6 +72,13 @@
     </tr>
 
 </table>
+
+<script>
+    function plot() {
+        document.getElementById('stock_form').submit();
+        document.getElementById('loader_text').style.visibility = 'visible';
+    }
+</script>
 
 </body>
 {% endblock %}
