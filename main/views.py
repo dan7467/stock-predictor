@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
-from .plotter import Plotter
 from .stock_data_query import StockData
 from datetime import datetime, timedelta
 from .models import CustomUser
@@ -12,9 +11,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-
 stock_data_handler = StockData()
-graph_plot_handler = Plotter()
 
 # TO-DO 1.1: create a settings page, which the dark_mode will be toggled from
 # TO-DO 1.2: on every login/logout - take the current value of dark_theme (session variable) and update in db, for persistence
