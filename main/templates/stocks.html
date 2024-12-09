@@ -124,8 +124,11 @@
                     refreshStockData(response, sym);
                 });
             } else {
-                console.log('No stock symbol input');
+                console.log('Error: No stock symbol input');
             }
+        }
+        function formatNumToFixed(num, decimals){
+            return (Math.round(num * 100) / 100).toFixed(decimals);
         }
         (function (global, factory) {
             typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('chart.js'), require('chart.js/helpers')) :
@@ -168,23 +171,20 @@
                 },
             
                 plugins: {
-                tooltip: {
-                    intersect: false,
-                    mode: 'index',
-                    callbacks: {
-                    label(ctx) {
-                        const point = ctx.parsed;
-            
-                        if (!helpers.isNullOrUndef(point.y)) {
-                        return chart_js.defaults.plugins.tooltip.callbacks.label(ctx);
+                    tooltip: {
+                        intersect: false,
+                        mode: 'index',
+                        callbacks: {
+                            label(ctx) {
+                                const point = ctx.parsed;
+                                if (!helpers.isNullOrUndef(point.y)) {
+                                    return chart_js.defaults.plugins.tooltip.callbacks.label(ctx);
+                                }
+                                const {o, h, l, c} = point;
+                                return `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
+                            }
                         }
-            
-                        const {o, h, l, c} = point;
-            
-                        return `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
                     }
-                    }
-                }
                 }
             };
             
@@ -358,16 +358,16 @@
             getCenterPoint(useFinalPosition) {
                 const {x, low, high} = this.getProps(['x', 'low', 'high'], useFinalPosition);
                 return {
-                x,
-                y: (high + low) / 2
+                    x,
+                    y: (high + low) / 2
                 };
             }
             
             tooltipPosition(useFinalPosition) {
                 const {x, open, close} = this.getProps(['x', 'open', 'close'], useFinalPosition);
                 return {
-                x,
-                y: (open + close) / 2
+                    x,
+                    y: (open + close) / 2
                 };
             }
             }
@@ -473,7 +473,7 @@
             var barData = new Array(barCount);
             var lineData = new Array(barCount);
 
-            var curr_stock_sym = '(Choose stock!)';
+            var curr_stock_sym = '(No stock was chosen yet)';
 
             document.getElementById('stock_sym_title').innerHTML = `<b>${curr_stock_sym}</b> Chart`;
 
@@ -568,8 +568,6 @@
 
                 // mixed charts
                 chart.config.data.datasets[1].hidden = document.getElementById('mixed').value == 'true' ? false : true;
-                console.log(document.getElementById('mixed').value);
-                console.log(document.getElementById('mixed').value == 'true');
                 chart.update();
             };
 
@@ -600,18 +598,14 @@
                     }
                     barData = new Array(numOfDates);
                     lineData = new Array(numOfDates);
-                    //Object.keys(date_info).forEach(
-                    //    (key) => luxon.DateTime.fromRFC2822(key)
-                    //);
                     let dates = Object.keys(date_info);
                     for (let i = 0; i < numOfDates; i = i + 1) {
-                        console.log("date = "+dates[i]);
                         barData[i] = {
-                            x: dates[i].valueOf(),
-                            o: date_info[dates[i]]['Open'],
-                            h: date_info[dates[i]]['High'],
-                            l: date_info[dates[i]]['Low'],
-                            c: date_info[dates[i]]['Close']
+                            x: luxon.DateTime.fromMillis(Number(dates[i])).valueOf(),
+                            o: formatNumToFixed(date_info[dates[i]]['Open'], 3),
+                            h: formatNumToFixed(date_info[dates[i]]['High'], 3),
+                            l: formatNumToFixed(date_info[dates[i]]['Low'], 3),
+                            c: formatNumToFixed(date_info[dates[i]]['Close'], 3)
                         };
                         lineData[i] = {x: barData[i].x, y: barData[i].c};
                     }
