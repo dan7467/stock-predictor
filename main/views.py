@@ -8,6 +8,10 @@ from .plotter import Plotter
 from .stock_data_query import StockData
 from datetime import datetime, timedelta
 from .models import CustomUser
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 stock_data_handler = StockData()
 graph_plot_handler = Plotter()
@@ -28,46 +32,25 @@ def about(request):
     return render(request, 'about.html')
 
 @login_required
-def stocks(request):
-    profile = CustomUser.objects.get(username=request.user.username)   
-    if request.method == 'POST':
-        # if this is a PATCH simulation - it is merely a stock saving to My Stocks
-        if request.POST.get('_method') == 'PATCH':
-            stock_symbol = request.POST.get('_symbol', False)         
-            if stock_symbol and stock_symbol not in profile.my_stocks and stock_data_handler.check_if_symbol_exists(stock_symbol):
-                try:
-                    profile.my_stocks.append(stock_symbol)
-                    profile.save()
-                    messages.success(request, f"Stock {stock_symbol} added to 'My Stocks'!")
-                except Exception as e:
-                    messages.error(request, f"Could not update stock: {e}")
-            else:
-                messages.error(request, 'No stock symbol was entered!')
-            return render(request, 'stocks.html', {'stock_name': stock_symbol, 'my_stocks': profile.my_stocks})  # Re-render the same page
+@csrf_exempt
+@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+def get_stock_data(request):
+    body = json.loads(request.body)
+    print(f'\n\n\nREQUEST = {body.get('stock_symbol')}\n\n\n')
+    ticker = body.get('stock_symbol')
+    start_date = body.get('from_date')
+    end_date = body.get('to_date')
+    dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
         
-        # Plot stock data based on user inputs:
-        
-        # TO-DO: implement cache such that if range was thinned down (new_date_start >= old _date_start and new_date_end <= old_date_end),
-        #           then we use the already retrieved info from yf instead of re-calling it
-        ticker = request.POST.get('stock_sym', False)
-        start_date = request.POST.get('date_start', False)
-        end_date = request.POST.get('date_end', False)
-        
-        # validate dates
-        dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
-        
-        if ticker and start_date and end_date and dates_valid:
+    if ticker and start_date and end_date and dates_valid:
             
-            x_axis_property = "Date"
-            y_axis_property = "Close"
-            
-            data = stock_data_handler.fetch_data(ticker, start_date, end_date)
-            graph = graph_plot_handler.plot(data, x_axis_property, y_axis_property, stock_name=ticker, includes_prediction=True, dark_mode=request.session["dark_theme"])
-            
-            return render(request, 'stocks.html', {'graph': graph, 'stock_name': ticker, 'my_stocks': profile.my_stocks})
-        
-    return render(request, 'stocks.html', {'my_stocks': profile.my_stocks})
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_data(ticker, start_date, end_date).to_json()})
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
 
+@login_required
+def stocks(request):
+    profile = CustomUser.objects.get(username=request.user.username)
+    return render(request, 'stocks.html', {'my_stocks': profile.my_stocks})
 
 @login_required
 def my_profile(request):
