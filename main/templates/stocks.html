@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
 </head>
 <body>
-    <h2 id="stock_sym_title">Sample Chart</h2>
+    <h1 id="stock_sym_title">Sample Chart</h1>
     <div style="width:1000px">
         <canvas id="chart"></canvas>
     </div>
@@ -31,11 +31,6 @@
         <select id="mixed" style="visibility: hidden;">
             <option value="true" selected>Yes</option>
         </select>
-    </div>
-    <div class="form-container">
-        <form id="stock_form" method="post" class="forms">
-            <br/>
-        </form>
     </div>
     
     <input type="hidden" name="_method" value="PATCH">
@@ -92,7 +87,7 @@
     </table>
 
     <script>
-        
+        // TO-DO: align the stock data controller row to be centered vertically the same
         function update_name() {
             document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
         }
@@ -121,6 +116,7 @@
                     to_date: document.getElementById('date_end').value
                 };
                 client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
+                    // TO-DO: merge this refreshStockData(response, sym) function call with the function below (maybe move this one down there) for performance
                     refreshStockData(response, sym);
                 });
             } else {

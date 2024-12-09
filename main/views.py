@@ -29,6 +29,18 @@ def about(request):
     return render(request, 'about.html')
 
 @login_required
+def updates(request):
+    profile = CustomUser.objects.get(username=request.user.username)
+    return render(request, 'updates.html', {'my_stocks': profile.my_stocks})
+
+@login_required
+@csrf_exempt
+def get_current_stock_price(request):
+    res = stock_data_handler.fetch_current_stock_info(json.loads(request.body).get('stock_symbol'))
+    print('\n\n\nres = ', res,'\n\n\n')
+    return JsonResponse({"status": "success", "data": res.to_json()})
+
+@login_required
 @csrf_exempt
 @require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
 def get_stock_data(request):

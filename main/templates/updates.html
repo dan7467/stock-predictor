@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+
+<h1><u>Stock updates</u></h1>
+
+{% if user.is_authenticated %}
+
+<br/><br/>
+
+<h3>New Updates:</h3>
+
+<div>
+    <table class="table table-bordered">
+        <tr>
+            <td id="table_row_header">
+                Timestamp (Soon...)
+            </td>
+            <td>
+                Update (Soon...)
+            </td>
+        </tr>
+    </table>
+</div>
+
+<br/><br/>
+
+<h3>Subscribe for stock updates:</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td><label for="stock_sym" class="form-label">Stock Symbol: </label></td>
+            <td><label for="date" class="form-label">Directive: </label></td>
+            <td><label for="date" class="form-label">Value: </label></td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <div class="mb-3" id="table_cell_centered">
+                {% if stock_name %}
+                    <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" list="my_stocks_list" required>
+                {% else %}
+                    <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
+                {% endif %}
+                <datalist id="my_stocks_list">
+                    {% if my_stocks %}
+                        {% for my_stock in my_stocks %}
+                            <option value="{{ my_stock }}">
+                        {% endfor %}
+                    {% endif %}
+                </datalist>
+            </div>
+        </td>
+        <td>
+            <div class="mb-3" id="table_cell_centered">
+                Notify me when the stock's price is
+                <select>
+                    <option>more than</option>
+                    <option>less than</option>
+                </select>
+            </div>
+        </td>
+        <td>
+            <div class="mb-3" id="table_cell_centered">
+                <input type="number" id="bound_val" step="0.001" name="bound_val"/>
+                <a id="value_refresh_disclaimer"></a>
+            </div>
+        </td>
+        <td id="table_cell_centered">
+            <button type="button" onclick="getStockData()" class="btn btn-secondary">Subscribe</button>
+        </td>
+    </tr>
+</tbody>
+</table>
+
+<script>
+
+    document.getElementById("stock_sym").addEventListener("focusout", getStockCurrentPrice);
+
+    var HttpClient = function() {
+        this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
+            var anHttpRequest = new XMLHttpRequest();
+            anHttpRequest.onreadystatechange = function() {
+                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                    aCallback(anHttpRequest.responseText);
+            };
+            anHttpRequest.open(requestType, aUrl, true);
+            anHttpRequest.setRequestHeader("Content-Type", "application/json"); // Set content type to JSON
+            anHttpRequest.send(JSON.stringify(data)); // Send data as JSON
+        };
+    };
+
+    function formatNumToFixed(num, decimals){
+        return (Math.round(num * 100) / 100).toFixed(decimals);
+    }
+    
+    var client = new HttpClient();
+    
+    function getStockCurrentPrice() {
+        let sym = document.getElementById('stock_sym').value;
+        if (sym !== '') {
+            const data = {
+                stock_symbol: sym
+            };
+            client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_current_stock_price', data, function(response) {
+                
+                let res = JSON.parse(response);
+                let parsed_data = JSON.parse(res['data']);
+                let keys_as_nums = Object.keys(parsed_data['Close']).map((x) => Number(x));
+                let lastPrice = parsed_data['Close'][keys_as_nums[keys_as_nums.length - 1].toString()];
+                console.log(`lastPrice = ${lastPrice}`);
+                document.getElementById("bound_val").value = formatNumToFixed(lastPrice, 3);
+                document.getElementById("value_refresh_disclaimer").innerHTML = `Note: the above price is fetched every minute,<br/> so refrain from taking it as ms/second-accurate`;
+            });
+        } else {
+            console.log('Error: No stock symbol input');
+        }
+    }
+
+</script>
+
+{% else %}
+
+<div>
+
+    This page is only available to members - register now!
+
+</div>
+
+{% endif %}
+
+</body>
+
+{% endblock %}

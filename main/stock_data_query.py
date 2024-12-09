@@ -22,3 +22,6 @@ class StockData:
     def fetch_data_as_dict(self, ticker, start_date, end_date, x_axis_property, y_axis_property):
         data_dict_of_two_lists = self.fetch_data(ticker, start_date, end_date)[y_axis_property].reset_index().to_dict(orient='list')
         return dict(zip(map(lambda ts: ts.strftime("%m/%d/%Y, %H:%M:%S"), data_dict_of_two_lists[x_axis_property]), data_dict_of_two_lists[ticker]))
+    
+    def fetch_current_stock_info(self, ticker):
+        return yf.Ticker(ticker).history(period="1d", interval="1m")
