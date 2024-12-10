@@ -12,15 +12,21 @@
 
             <ul class="navbar-nav">
 
-                <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'home' %}">Home</a></li>
-
-                <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about' %}">About</a></li>
-
                 {% if user.is_authenticated %}
 
-                <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'stocks' %}">Stocks</a></li>
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'home_members' %}">Home</a></li>
 
-                <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'updates' %}">Updates</a></li>
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about_members' %}">About</a></li>
+
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'stocks' %}">Stocks</a></li>
+
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'updates' %}">Updates</a></li>
+
+                {% else %}
+
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'home' %}">Home</a></li>
+
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about' %}">About</a></li>
 
                 {% endif %}
 

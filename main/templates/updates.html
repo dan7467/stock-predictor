@@ -10,76 +10,138 @@
 
 <br/><br/>
 
-<h3>New Updates:</h3>
+<h3>Notifications:</h3>
+    <div>
+        <table class="table table-bordered">
+            {% if user.user_notifications %}
+                {% for notification in user.user_notifications %}
+                    <tr>
+                        <td id="table_row_header"><b>{{notification.0}}</b></td>
+                        <td>{{notification.1}}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td id="table_row_header">None</td>
+                    <td>No subscriptions has been created yet!</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+
+<br/>
+
+<h3>Subscriptions in Queue:</h3>
 
 <div>
-    <table class="table table-bordered">
-        <tr>
-            <td id="table_row_header">
-                Timestamp (Soon...)
-            </td>
-            <td>
-                Update (Soon...)
-            </td>
-        </tr>
-    </table>
+    <form method="post">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th><u>Subscription Date</u>:</th>
+                    <th><u>Details</u>:</th>
+                    <th><u>Remove Subscription:</u>:</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if my_updates %}
+                {% for update_stock, update_specifics in my_updates.items %}
+                    <tr>
+                        <td id="table_row_header">
+                            {{ update_specifics.0 }}
+                        </td>
+                        <td>
+                            Notify when <b><a style="color: #D95F59;">{{ update_stock }}<a></b> gets <b>
+                                
+                                    {% if update_specifics.1 == 'up' %}
+                                        <a style="color: #4CCD99;">
+                                    {% else %}
+                                        <a style="color: #FF204E;">
+                                    {% endif %}
+                                {{ update_specifics.1 }}</a>
+                            </b> to <b>{{ update_specifics.2 }}</b>
+                        </td>
+                        <td id="table_row_header">
+                        <button type="submit" id="del_{{ update_stock }}_{{update_specifics.1}}_{{ update_specifics.2 }}_btn" onclick="remove_subscription('{{ update_stock }}', '{{ update_specifics.1 }}', '{{ update_specifics.2 }}')" class="btn btn-danger">Remove</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td id="table_row_header">
+                        None
+                    </td>
+                    <td>
+                        No subscriptions has been created yet!
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="hidden" id="del_stock_sym" name="stock_sym" value="">
+        <input type="hidden" id="del_price_direction" name="price_direction" value="">
+        <input type="hidden" id="del_bound_val" name="bound_val" value="">
+    </form>
 </div>
 
 <br/><br/>
 
 <h3>Subscribe for stock updates:</h3>
-
-<table class="table table-bordered">
-    <thead>
+<form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td><label for="stock_sym" class="form-label">Stock Symbol: </label></td>
+                <td><label for="date" class="form-label">Directive: </label></td>
+                <td><label for="date" class="form-label">Value: </label></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
         <tr>
-            <td><label for="stock_sym" class="form-label">Stock Symbol: </label></td>
-            <td><label for="date" class="form-label">Directive: </label></td>
-            <td><label for="date" class="form-label">Value: </label></td>
-            <td></td>
-        </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>
-            <div class="mb-3" id="table_cell_centered">
-                {% if stock_name %}
-                    <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" list="my_stocks_list" required>
-                {% else %}
-                    <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
-                {% endif %}
-                <datalist id="my_stocks_list">
-                    {% if my_stocks %}
-                        {% for my_stock in my_stocks %}
-                            <option value="{{ my_stock }}">
-                        {% endfor %}
+            <td>
+                <div class="mb-3" id="table_cell_centered">
+                    {% if stock_name %}
+                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" list="my_stocks_list" required>
+                    {% else %}
+                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
                     {% endif %}
-                </datalist>
-            </div>
-        </td>
-        <td>
-            <div class="mb-3" id="table_cell_centered">
-                Notify me when the stock's price is
-                <select>
-                    <option>more than</option>
-                    <option>less than</option>
-                </select>
-            </div>
-        </td>
-        <td>
-            <div class="mb-3" id="table_cell_centered">
-                <input type="number" id="bound_val" step="0.001" name="bound_val"/>
-                <a id="value_refresh_disclaimer"></a>
-            </div>
-        </td>
-        <td id="table_cell_centered">
-            <button type="button" onclick="getStockData()" class="btn btn-secondary">Subscribe</button>
-        </td>
-    </tr>
-</tbody>
-</table>
-
+                    <datalist id="my_stocks_list">
+                        {% if my_stocks %}
+                            {% for my_stock in my_stocks %}
+                                <option value="{{ my_stock }}">
+                            {% endfor %}
+                        {% endif %}
+                    </datalist>
+                </div>
+            </td>
+            <td>
+                <div class="mb-3" id="table_cell_centered">
+                    Notify me when the stock's price is
+                    <select id="price_direction" name="price_direction" required>
+                        <option value="up">equal to OR more than</option>
+                        <option value="down">equal to OR less than</option>
+                    </select>
+                </div>
+            </td>
+            <td>
+                <div class="mb-3" id="table_cell_centered">
+                    <input type="number" id="bound_val" step="0.001" name="bound_val" required/>
+                    <a id="value_refresh_disclaimer"></a>
+                </div>
+            </td>
+            <td id="table_cell_centered">
+                <button type="submit" class="btn btn-secondary">Subscribe</button>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+<input type="hidden" name="_method" value="PATCH">
+</form>
 <script>
-
     document.getElementById("stock_sym").addEventListener("focusout", getStockCurrentPrice);
 
     var HttpClient = function() {
@@ -108,18 +170,24 @@
                 stock_symbol: sym
             };
             client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_current_stock_price', data, function(response) {
-                
                 let res = JSON.parse(response);
                 let parsed_data = JSON.parse(res['data']);
                 let keys_as_nums = Object.keys(parsed_data['Close']).map((x) => Number(x));
                 let lastPrice = parsed_data['Close'][keys_as_nums[keys_as_nums.length - 1].toString()];
-                console.log(`lastPrice = ${lastPrice}`);
                 document.getElementById("bound_val").value = formatNumToFixed(lastPrice, 3);
                 document.getElementById("value_refresh_disclaimer").innerHTML = `Note: the above price is fetched every minute,<br/> so refrain from taking it as ms/second-accurate`;
             });
         } else {
             console.log('Error: No stock symbol input');
         }
+    }
+
+    function remove_subscription(stock_sym, dir, val) {
+            document.getElementById('del_stock_sym').value = stock_sym;
+            document.getElementById('del_price_direction').value = dir;
+            document.getElementById('del_bound_val').value = val;
+            document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').innerHTML = 'Loading...';
+            document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').className = 'btn btn-secondary';
     }
 
 </script>

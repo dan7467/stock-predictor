@@ -10,7 +10,7 @@
 </head>
 <body>
     <h1 id="stock_sym_title">Sample Chart</h1>
-    <div style="width:1000px">
+    <div style="min-width:100%; width:100%; max-width:100%;">
         <canvas id="chart"></canvas>
     </div>
     <div>
@@ -33,9 +33,6 @@
         </select>
     </div>
     
-    <input type="hidden" name="_method" value="PATCH">
-    <input type="hidden" name="_symbol" id="_symbol" value="PATCH">
-    
     <table>
         <thead>
             <tr>
@@ -52,8 +49,8 @@
         <tr>
             <td>
                 <div class="mb-3" id="table_cell_centered">
-                    {% if stock_name %}
-                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ stock_name }}" list="my_stocks_list" required>
+                    {% if chosen_stock_name %}
+                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ chosen_stock_name }}" list="my_stocks_list" required>
                     {% else %}
                         <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
                     {% endif %}
@@ -78,16 +75,21 @@
                     <input type="date" id="date_end" name="date_end" value="2024-12-06" />
                 </div>
             </td>
-            <td></td>
             <td id="table_cell_centered">
-                <button type="button" onclick="getStockData()" class="btn btn-secondary">Update</button>
+                <button type="button" onclick="getStockData()" class="btn btn-primary">Update</button>
+            </td>
+            <td id="table_cell_centered">
+                <form method="POST">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <input type="hidden" name="_symbol" id="_symbol" value="">
+                    <button type="submit" onclick="update_name()" class="btn btn-secondary">Save Stock</button>
+                </form>
             </td>
         </tr>
     </tbody>
     </table>
 
     <script>
-        // TO-DO: align the stock data controller row to be centered vertically the same
         function update_name() {
             document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
         }
@@ -568,6 +570,8 @@
             };
 
             [...document.getElementsByTagName('select')].forEach(element => element.addEventListener('change', update));
+
+            window.addEventListener('load', getStockData);
 
             function refreshStockData(new_stock_data, stock_symbol) {
                 let res = JSON.parse(new_stock_data);
