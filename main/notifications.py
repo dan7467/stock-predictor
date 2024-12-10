@@ -21,19 +21,17 @@ def check_updates(request, yf_handler):
     res = []
     est = pytz.timezone('US/Eastern')  # yfinance is in EST time
     for subscribed_update in subscribed_updates:
-        if subscribed_update == 'AAPL':  # REMOVE THIS, ONLY FOR TESTING
-            continue  # REMOVE THIS, ONLY FOR TESTING
-        # print(f'\n{subscribed_update}: {subscribed_updates[subscribed_update]}\n')  # AAPL: ['23:55:54, 09.12.24', 'down', '226.810']
+        directive_datetime = datetime.strptime(subscribed_updates[subscribed_update][0], "%H:%M:%S, %d.%m.%y").replace(tzinfo=timezone.utc)
         directive_dir = subscribed_updates[subscribed_update][1]
-        directive_val = Decimal(subscribed_updates[subscribed_update][2])
-        
+        directive_val = subscribed_updates[subscribed_update][2]
         if same_date_and_today:
             fetched_data = yf_handler.fetch_current_day_stock_info(subscribed_update)
             if directive_dir == 'up':
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
                     parsed_date = datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S")
                     parsed_date_utc = est.localize(parsed_date, is_dst=None).astimezone(pytz.utc)
-                    if Decimal(val) >= directive_val and parsed_date_utc > last_action_time:
+                    # print(f'Decimal({val}) >= Decimal(directive_val(={directive_val})): {Decimal(val) >= directive_val}. {parsed_date_utc} > {directive_datetime}: {parsed_date_utc > directive_datetime}')
+                    if Decimal(val) >= Decimal(directive_val) and parsed_date_utc > directive_datetime:
                         res.append([datetime.strftime(parsed_date_utc, "%H:%M:%S, %d.%m.%y"), subscribed_update, directive_dir, directive_val])
             elif directive_dir == 'down':
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
@@ -50,19 +48,16 @@ def check_updates(request, yf_handler):
             
 
 def add_user_notification(request, notification_message):
+    # regular user notification, of length 2: [datetime_utc_str, notification_msg]
     profile = CustomUser.objects.get(username=request.user.username)
-    profile.user_notifications.append([datetime.now().strftime("%H:%M:%S, %d.%m.%y"), notification_message])
+    profile.user_notifications.append([datetime.now().strftime("%H:%M, %d.%m.%y"), notification_message])
     profile.save()
     
-def add_user_stock_notification(request, profile, notification_message, date_str, dir):
-    if dir == 'up':
-        profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#4CCD99'])
+def add_user_stock_notification(request, profile, update):  # update == ["%H:%M:%S, %d.%m.%y", subscribed_update, directive_dir, directive_val]
+    # user stock subscription notification, of length 5: [datetime_utc_str, subscribed_update, directive_dir, directive_val, color(according to directive_dir)]
+    if update[2] == 'up':
+        profile.user_notifications.append([datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3], '#4CCD99'])
     else:
-        profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#FF204E'])
+        profile.user_notifications.append([datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3], '#FF204E'])
     profile.save()
-    print(f'added notification: {[datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message]}')
-    
-# def add_user_notification_from_past(request, profile, notification_message, date_str):
-#     profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#4CCD99'])
-#     profile.save()
-#     print(f'added notification: {[datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message]}')
+    print(f'added notification: {[datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3]]}')

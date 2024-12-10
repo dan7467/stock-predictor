@@ -31,7 +31,7 @@ def last_action_timestamp_update(request):
     if len(new_updates) > 0:  # means new_updates is a list where update == ["%H:%M:%S, %d.%m.%y", subscribed_update, directive_dir, directive_val]
         print(f'\n\nnew_updates = {new_updates}')
         for update in new_updates:
-            notifications.add_user_stock_notification(request, profile, f'{update[1]} has reached {update[2]} to price {update[3]}!', update[0], update[2])
+            notifications.add_user_stock_notification(request, profile, update)
             del profile.user_updates[update[1]]
             profile.save()
     profile.last_action_datetime_utc = datetime.now(timezone.utc).strftime("%H:%M:%S, %d.%m.%y")
@@ -62,7 +62,7 @@ def updates(request):
         directive = request.POST.get('price_direction', False)
         directive_value = request.POST.get('bound_val', False)   
         if request.POST.get('_method') == 'PATCH': 
-            timestamp = datetime.now().strftime("%H:%M:%S, %d.%m.%y")
+            timestamp = datetime.now(timezone.utc).strftime("%H:%M:%S, %d.%m.%y")
             if stock_symbol and directive and directive_value and stock_symbol not in profile.user_updates and stock_data_handler.check_if_symbol_exists(stock_symbol):
                 try:
                     profile.user_updates[stock_symbol] = [timestamp, directive, directive_value]

@@ -9,7 +9,7 @@
 {% if user.is_authenticated %}
 
 <br/><br/>
-
+{% comment %} [datetime_str(format="%H:%M, %d.%m.%y"), subscribed_update, directive_dir, directive_val, '#FF204E'] {% endcomment %}
 <h3>Notifications:</h3>
     <div>
         <table class="table table-bordered">
@@ -18,7 +18,7 @@
                         <tr>
                             <td id="table_row_header"><b>{{notification.0}}</b></td>
                     {% if notification|length > 2 %}
-                            <td style="color: {{ notification.2 }};">{{notification.1}}</td>
+                            <td><b>{{notification.1}}</b> has reached <b style="color: {{ notification.4 }};">{{notification.2}}</b> to price <b>{{notification.3}}</b>!</td>
                     {% else %}
                             <td>{{notification.1}}</td>
                     {% endif %}
