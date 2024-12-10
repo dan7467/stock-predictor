@@ -24,6 +24,11 @@ html {
     color: var(--text);
 }
 
+#main_site_buttons:hover {
+    transform:scale(1.05);
+    transition: 0.2s;
+}
+
 #body {
     background-color: inherit;
     text-align: center;
@@ -51,6 +56,11 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
 #logo {
     font-size: 32px;
     color: var(--text);
+}
+
+#logo:hover {
+    color: #b5b593;
+    transition: 0.6s;
 }
 
 #table_cell_centered {

@@ -15,11 +15,12 @@ def check_updates(request, yf_handler):
     last_action_time = datetime.strptime(profile.last_action_datetime_utc, "%H:%M:%S, %d.%m.%y").replace(tzinfo=timezone.utc)
     last_action_date = last_action_time.date()
     subscribed_updates = profile.user_updates
-    curr_time = datetime.now(timezone.utc)
+    curr_time = datetime.now(timezone.utc)  # TO-DO: remove some of these date objects here, some are not used
     curr_date = curr_time.date()
     same_date_and_today = curr_date == last_action_date
     res = []
     est = pytz.timezone('US/Eastern')  # yfinance is in EST time
+    # TO-DO: test thoroughly this whole function and it's end cases
     for subscribed_update in subscribed_updates:
         directive_datetime = datetime.strptime(subscribed_updates[subscribed_update][0], "%H:%M:%S, %d.%m.%y").replace(tzinfo=timezone.utc)
         directive_dir = subscribed_updates[subscribed_update][1]
@@ -30,15 +31,16 @@ def check_updates(request, yf_handler):
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
                     parsed_date = datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S")
                     parsed_date_utc = est.localize(parsed_date, is_dst=None).astimezone(pytz.utc)
-                    # print(f'Decimal({val}) >= Decimal(directive_val(={directive_val})): {Decimal(val) >= directive_val}. {parsed_date_utc} > {directive_datetime}: {parsed_date_utc > directive_datetime}')
+                    # print(f'Decimal({val}) >= Decimal(directive_val(={directive_val})): {Decimal(val) >= Decimal(directive_val)}. {parsed_date_utc} > {directive_datetime}: {parsed_date_utc > directive_datetime}')
                     if Decimal(val) >= Decimal(directive_val) and parsed_date_utc > directive_datetime:
                         res.append([datetime.strftime(parsed_date_utc, "%H:%M:%S, %d.%m.%y"), subscribed_update, directive_dir, directive_val])
             elif directive_dir == 'down':
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
                     parsed_date = datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S")
                     parsed_date_utc = est.localize(parsed_date, is_dst=None).astimezone(pytz.utc)
-                    if Decimal(val) <= directive_val and parsed_date_utc > last_action_time:
-                        res.append([datetime.strftime(datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S"), "%H:%M:%S, %d.%m.%y"), subscribed_update, directive_dir, directive_val])
+                    # print(f'Decimal({val}) <= Decimal(directive_val(={directive_val})): {Decimal(val) <= Decimal(directive_val)}. {parsed_date_utc} > {directive_datetime}: {parsed_date_utc > directive_datetime}')
+                    if Decimal(val) <= Decimal(directive_val) and parsed_date_utc > directive_datetime:
+                        res.append([datetime.strftime(parsed_date_utc, "%H:%M:%S, %d.%m.%y"), subscribed_update, directive_dir, directive_val])
             else:  # means this is a bad subscription: direction not in ['up', 'down'], as it should be
                 continue
         # else:  # TO-DO: test this else clause, and maybe two fetches is not needed, it is wasteful so better narrow it down to 1

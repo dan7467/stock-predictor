@@ -27,7 +27,7 @@
             {% else %}
                 <tr>
                     <td id="table_row_header">None</td>
-                    <td>No subscriptions has been created yet!</td>
+                    <td>No new Notifications yet!</td>
                 </tr>
             {% endif %}
         </table>
@@ -35,7 +35,7 @@
 
 <br/>
 
-<h3>Subscriptions in Queue:</h3>
+<h3>Subscriptions:</h3>
 
 <div>
     <form method="post">
@@ -79,6 +79,7 @@
                     <td>
                         No subscriptions has been created yet!
                     </td>
+                    <td></td>
                 </tr>
             {% endif %}
             </tbody>
@@ -89,9 +90,9 @@
         <input type="hidden" id="del_bound_val" name="bound_val" value="">
     </form>
 </div>
-
-<br/><br/>
-
+<button id="add_subscription_btn" onclick="reveal_subscription_form()" class="btn btn-light"><b>+</b></button>
+<br/>
+<div id="subscribe_form_container" style="visibility: hidden;">
 <h3>Subscribe for stock updates:</h3>
 <form method="post">
     {% csrf_token %}
@@ -133,7 +134,7 @@
             </td>
             <td>
                 <div class="mb-3" id="table_cell_centered">
-                    <input type="number" id="bound_val" step="0.001" name="bound_val" required/>
+                    <input type="number" id="bound_val" step="0.001" name="bound_val" style="max-width:160px;" required/>
                     <a id="value_refresh_disclaimer"></a>
                 </div>
             </td>
@@ -145,6 +146,11 @@
     </table>
 <input type="hidden" name="_method" value="PATCH">
 </form>
+<div><u>Note</u>: Our system currently has minimum of 1 second accuracy, meaning if a stock price crosses <b>into</b> the selected range, and <b>out</b>,
+    <br/>in <b>less than a minute</b>, the subscription may not catch this bounce. this will improve in the future (into real-time.)</div>    
+</div>
+
+
 <script>
     document.getElementById("stock_sym").addEventListener("focusout", getStockCurrentPrice);
 
@@ -192,6 +198,11 @@
             document.getElementById('del_bound_val').value = val;
             document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').innerHTML = 'Loading...';
             document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').className = 'btn btn-secondary';
+    }
+
+    function reveal_subscription_form() {
+        document.getElementById("add_subscription_btn").style.visibility = "hidden";
+        document.getElementById("subscribe_form_container").style.visibility = "visible";
     }
 
 </script>
