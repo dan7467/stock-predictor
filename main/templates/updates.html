@@ -15,10 +15,14 @@
         <table class="table table-bordered">
             {% if user.user_notifications %}
                 {% for notification in user.user_notifications %}
-                    <tr>
-                        <td id="table_row_header"><b>{{notification.0}}</b></td>
-                        <td>{{notification.1}}</td>
-                    </tr>
+                        <tr>
+                            <td id="table_row_header"><b>{{notification.0}}</b></td>
+                    {% if notification|length > 2 %}
+                            <td style="color: {{ notification.2 }};">{{notification.1}}</td>
+                    {% else %}
+                            <td>{{notification.1}}</td>
+                    {% endif %}
+                        </tr>
                 {% endfor %}
             {% else %}
                 <tr>

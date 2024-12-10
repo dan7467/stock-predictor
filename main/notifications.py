@@ -33,10 +33,8 @@ def check_updates(request, yf_handler):
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
                     parsed_date = datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S")
                     parsed_date_utc = est.localize(parsed_date, is_dst=None).astimezone(pytz.utc)
-                    print(f'parsed_date_utc={parsed_date_utc}, last_action_time={last_action_time}')
                     if Decimal(val) >= directive_val and parsed_date_utc > last_action_time:
                         res.append([datetime.strftime(parsed_date_utc, "%H:%M:%S, %d.%m.%y"), subscribed_update, directive_dir, directive_val])
-                        print('UP!')
             elif directive_dir == 'down':
                 for date, val in fetched_data['Close'].items():  # TO-DO: verify that this is also the live price (when market is open)
                     parsed_date = datetime.strptime(str(date)[:str(date).rindex('-')], "%Y-%m-%d %H:%M:%S")
@@ -56,7 +54,15 @@ def add_user_notification(request, notification_message):
     profile.user_notifications.append([datetime.now().strftime("%H:%M:%S, %d.%m.%y"), notification_message])
     profile.save()
     
-def add_user_notification_from_past(request, profile, notification_message, date_str):
-    profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message])
+def add_user_stock_notification(request, profile, notification_message, date_str, dir):
+    if dir == 'up':
+        profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#4CCD99'])
+    else:
+        profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#FF204E'])
     profile.save()
     print(f'added notification: {[datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message]}')
+    
+# def add_user_notification_from_past(request, profile, notification_message, date_str):
+#     profile.user_notifications.append([datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message, '#4CCD99'])
+#     profile.save()
+#     print(f'added notification: {[datetime.strptime(date_str, "%H:%M:%S, %d.%m.%y").strftime("%H:%M:%S, %d.%m.%y"), notification_message]}')
