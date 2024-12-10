@@ -27,15 +27,13 @@ def toggle_dark_theme(request):
 @login_required
 def last_action_timestamp_update(request):
     profile = CustomUser.objects.get(username=request.user.username)
-    new_updates = notifications.check_updates(request, stock_data_handler)
+    new_updates = notifications.check_updates(request, profile, stock_data_handler)
     if len(new_updates) > 0:  # means new_updates is a list where update == ["%H:%M:%S, %d.%m.%y", subscribed_update, directive_dir, directive_val]
-        print(f'\n\nnew_updates = {new_updates}')
         for update in new_updates:
             notifications.add_user_stock_notification(request, profile, update)
             del profile.user_updates[update[1]]
             profile.save()
     profile.last_action_datetime_utc = datetime.now(timezone.utc).strftime("%H:%M:%S, %d.%m.%y")
-    print(f'updated last action: {profile.last_action_datetime_utc}')
     profile.save()
 
 def home_members(request):
@@ -72,7 +70,6 @@ def updates(request):
                     return JsonResponse({f"status": "error", "message": "Error occurred while creating subscription"})
             return JsonResponse({"status": "error", "message": "Error: Stock already subscripted to, or doesn't exist"})
         elif request.POST.get('_method') == 'DELETE':
-            print(f'\n\nstock_symbol = {stock_symbol}, directive = {directive}, directive_value = {directive_value}\n\n')
             if stock_symbol and directive and directive_value and stock_symbol in profile.user_updates:
                 try:
                     del profile.user_updates[stock_symbol]
@@ -98,14 +95,11 @@ def get_current_stock_price(request):
 @require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
 def get_stock_data(request):
     body = json.loads(request.body)
-    print(f'\n\n\nREQUEST = {body.get('stock_symbol')}\n\n\n')
     ticker = body.get('stock_symbol')
     start_date = body.get('from_date')
     end_date = body.get('to_date')
     dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
-        
     if ticker and start_date and end_date and dates_valid:
-            
         return JsonResponse({"status": "success", "data": stock_data_handler.fetch_data(ticker, start_date, end_date).to_json()})
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
 
