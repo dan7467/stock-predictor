@@ -41,7 +41,6 @@ def home_members(request):
     return render(request, 'home.html')
 
 def about_members(request):
-    profile = CustomUser.objects.get(username=request.user.username)
     last_action_timestamp_update(request)
     return render(request, 'about.html')
 
@@ -50,6 +49,9 @@ def home(request):
 
 def about(request):
     return render(request, 'about.html')
+
+def to_crypto_orbit(request):
+    return render(request, 'to_crypto_orbit.html')
     
 @login_required
 def updates(request):

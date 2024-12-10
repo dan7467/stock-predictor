@@ -14,5 +14,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('my_profile/', views.my_profile, name='my_profile'),
+    path('to_crypto_orbit/', views.to_crypto_orbit, name='to_crypto_orbit'),
     path("toggle-dark-theme/", views.toggle_dark_theme, name="toggle_dark_theme"),
 ]
