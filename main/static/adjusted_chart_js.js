@@ -30,7 +30,7 @@ function getStockData() {
             refreshStockData(response, sym);
         });
     } else {
-        console.log('Error: No stock symbol input');
+        alert('Error: No stock symbol input');
     }
 }
 function formatNumToFixed(num, decimals){
@@ -63,7 +63,9 @@ function formatNumToFixed(num, decimals){
         x: {
             type: 'time', // or 'linear' depending on your data
             time: {
-                unit: 'day' // Ensure this matches your granularity (e.g., day, week, etc.)
+                displayFormats: {
+                        day: 'DD, hh:mm'
+                    }
             },
             ticks: {
                 autoSkip: false, // Ensures all labels are shown
@@ -86,8 +88,8 @@ function formatNumToFixed(num, decimals){
                         if (!helpers.isNullOrUndef(point.y)) {
                             return chart_js.defaults.plugins.tooltip.callbacks.label(ctx);
                         }
-                        const {o, h, l, c} = point;
-                        return `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
+                        const {o, h, l, c, v} = point;
+                        return `O: ${o}  H: ${h}  L: ${l}  C: ${c} V: ${v}`;
                     }
                 }
             }
@@ -99,8 +101,8 @@ function formatNumToFixed(num, decimals){
         const parsed = me.getParsed(index);
         const axis = me._cachedMeta.iScale.axis;
     
-        const {o, h, l, c} = parsed;
-        const value = `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
+        const {o, h, l, c, v} = parsed;
+        const value = `O: ${o}  H: ${h}  L: ${l}  C: ${c} V: ${v}`;
     
         return {
         label: `${me._cachedMeta.iScale.getLabelForValue(parsed[axis])}`,
@@ -161,6 +163,7 @@ function formatNumToFixed(num, decimals){
         const high = vscale.getPixelForValue(data.h);
         const low = vscale.getPixelForValue(data.l);
         const close = vscale.getPixelForValue(data.c);
+        const vol = vscale.getPixelForValue(data.v);
     
         return {
         base: reset ? base : low,
@@ -170,7 +173,8 @@ function formatNumToFixed(num, decimals){
         open,
         high,
         low,
-        close
+        close,
+        vol
         };
     }
     
@@ -289,7 +293,7 @@ function formatNumToFixed(num, decimals){
         draw(ctx) {
             const me = this;
         
-            const {x, open, high, low, close} = me;
+            const {x, open, high, low, close, vol} = me;
         
             let borderColors = me.options.borderColors;
             if (typeof borderColors === 'string') {
@@ -376,6 +380,8 @@ function formatNumToFixed(num, decimals){
     ctx.canvas.width = 1000;
     ctx.canvas.height = 250;
 
+    const resolution = 20;
+
     var barData = new Array(barCount);
     var lineData = new Array(barCount);
 
@@ -407,22 +413,24 @@ function formatNumToFixed(num, decimals){
     }
 
     function randomBar(target, index, date, lastClose) {
-    var open = +randomNumber(lastClose * 0.95, lastClose * 1.05).toFixed(2);
-    var close = +randomNumber(open * 0.95, open * 1.05).toFixed(2);
-    var high = +randomNumber(Math.max(open, close), Math.max(open, close) * 1.1).toFixed(2);
-    var low = +randomNumber(Math.min(open, close) * 0.9, Math.min(open, close)).toFixed(2);
+        var open = +randomNumber(lastClose * 0.95, lastClose * 1.05).toFixed(2);
+        var close = +randomNumber(open * 0.95, open * 1.05).toFixed(2);
+        var high = +randomNumber(Math.max(open, close), Math.max(open, close) * 1.1).toFixed(2);
+        var low = +randomNumber(Math.min(open, close) * 0.9, Math.min(open, close)).toFixed(2);
+        var vol = 0;
 
-    if (!target[index]) {
-        target[index] = {};
-    }
+        if (!target[index]) {
+            target[index] = {};
+        }
 
-    Object.assign(target[index], {
-        x: date.valueOf(),
-        o: open,
-        h: high,
-        l: low,
-        c: close
-    });
+        Object.assign(target[index], {
+            x: date.valueOf(),
+            o: open,
+            h: high,
+            l: low,
+            c: close,
+            v: vol
+        });
 
     }
 
@@ -479,15 +487,20 @@ function formatNumToFixed(num, decimals){
 
     [...document.getElementsByTagName('select')].forEach(element => element.addEventListener('change', update));
 
-    window.addEventListener('load', () => {
-        chart.config.data.datasets[1].hidden = document.getElementById('mixed').value == 'true' ? false : true;
-        chart.update();
-        getStockData();
-    });
+    // window.addEventListener('load', () => {
+    //     chart.config.data.datasets[1].hidden = document.getElementById('mixed').value == 'true' ? false : true;
+    //     chart.update();
+    //     getStockData();
+    // });
 
     function refreshStockData(new_stock_data, stock_symbol) {
+        // TO-DO: optimization for long time ranges - less sampling & more distance between date samples.
+        //                              (maybe from: stock_data_query.py)
         let res = JSON.parse(new_stock_data);
         let parsed_data = JSON.parse(res['data']);
+        // res['data'].length(period_of_time):  5days: 650, 14days: 1772, 1Month: 3803, 6Month: 22441, 1Y: 44,646, 5Y: 222,841 
+        // ideally: 7,000 samples.
+        // if len >= 6Month, narrow it down to 7,000: 
         if (
             res['status'] !== 'success' || 
             !(`('Open', '${stock_symbol}')` in parsed_data) || 
@@ -500,12 +513,12 @@ function formatNumToFixed(num, decimals){
             const numOfDates = Object.keys(parsed_data[`('Open', '${stock_symbol}')`]).length;
             let date_info = {};
             for (let key in parsed_data) {
-                const quality_name_processed = key.substring(2, key.indexOf(',') - 1); // Extract quality name (e.g., 'Open', 'Close', etc.)
+                const property_name_processed = key.substring(2, key.indexOf(',') - 1); // Extract quality name (e.g., 'Open', 'Close', etc.)
                 for (let date in parsed_data[key]) {
                     if (!date_info[date]) {
                         date_info[date] = {}; // Initialize the date key if it doesn't exist
                     }
-                    date_info[date][quality_name_processed] = parsed_data[key][date];
+                    date_info[date][property_name_processed] = parsed_data[key][date];
                 }
             }
             barData = new Array(numOfDates);
@@ -517,7 +530,8 @@ function formatNumToFixed(num, decimals){
                     o: formatNumToFixed(date_info[dates[i]]['Open'], 3),
                     h: formatNumToFixed(date_info[dates[i]]['High'], 3),
                     l: formatNumToFixed(date_info[dates[i]]['Low'], 3),
-                    c: formatNumToFixed(date_info[dates[i]]['Close'], 3)
+                    c: formatNumToFixed(date_info[dates[i]]['Close'], 3),
+                    v: formatNumToFixed(date_info[dates[i]]['Volume'], 3)
                 };
                 lineData[i] = {x: barData[i].x, y: barData[i].c};
             }
@@ -535,6 +549,77 @@ function formatNumToFixed(num, decimals){
                 lineData[i] = {x: barData[i].x, y: barData[i].c};
                 i++;
             }
+        }
+    }
+
+    function narrowDown(data) { // TO-DO: move this logic to backend, to happen at stock_data_query
+        const keys = Object.keys(data);
+        const timestamps = Object.keys(data[keys[0]]);
+        const totalLength = timestamps.length;
+        if (totalLength <= resolution) {
+            return data;
+        }
+        const interval = Math.ceil(totalLength / resolution);
+    
+        // Select timestamps to keep (every 'interval'th timestamp)
+        const sampledTimestamps = timestamps.filter((_, index) => index % interval === 0);
+    
+        // Create a new object with only the sampled timestamps for each key
+        const narrowedData = {};
+        keys.forEach((key) => {
+            narrowedData[key] = {};
+            sampledTimestamps.forEach((timestamp) => {
+                narrowedData[key][timestamp] = data[key][timestamp];
+            });
+        });
+    
+        return narrowedData;
+    }
+    
+
+    function getTodaysDateStr() {  // formatted: YYYY-MM-DD
+        var today = new Date();
+        return today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    }
+
+    function subtractDaysFromToday(daysToSubtract) {
+        Date.prototype.subtractDays = function (d) {
+            this.setDate(this.getDate() - d);
+            return this;
+        }
+        return new Date().subtractDays(daysToSubtract).toISOString().split('T')[0];
+    }
+
+    function autoDate(days_ago) {
+        let sym = document.getElementById('stock_sym').value;
+        let date_start = document.getElementById('date_start');
+        let date_end = document.getElementById('date_end');
+        let all_data = false;
+        // TO-DO: fix "Today"-button's bug.
+        console.log(days_ago);
+        if (days_ago != '1826') {
+            date_start.value = subtractDaysFromToday(Number(days_ago));
+        }
+        else if (days_ago === '0') {
+            date_start.value = getTodaysDateStr();
+            console.log("OK!");
+        }
+        else {
+            all_data = true; 
+        }
+        date_end.value = getTodaysDateStr();
+        console.log(`\n\n\n start = ${date_start.value}, end = ${date_end.value}`);
+        if (sym !== '') {
+            const data = {
+                stock_symbol: sym,
+                from_date: all_data ? 'ALL' : date_start.value,
+                to_date: date_end.value
+            };
+            client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
+                refreshStockData(response, sym);
+            });
+        } else {
+            alert('Error: No stock symbol input');
         }
     }
 

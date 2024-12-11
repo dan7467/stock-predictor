@@ -18,9 +18,9 @@
 
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about_members' %}">About</a></li>
 
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'stocks' %}">Stocks</a></li>
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'stocks' %}">Graph</a></li>
 
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'updates' %}">Updates</a></li>
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'updates' %}">Stock Updates</a></li>
 
                 {% else %}
 
@@ -50,7 +50,7 @@
                         <br/><br/>
                         <a class="btn btn-outline-dark ms-2" onclick="toggle_dark_theme()">Dark theme</a>
                         <br/><br/>
-                        <a class="btn btn-outline-danger ms-2" href="{% url 'logout' %}">Logout</a>
+                        <a class="btn btn-outline-danger ms-2" href="{% url 'log_out' %}">Logout</a>
                         
                     </div>
                 </div>
@@ -104,7 +104,7 @@
 
             {% else %}
 
-                <a class="btn btn-outline-primary ms-2" href="{% url 'login' %}">Login</a>
+                <a class="btn btn-outline-primary ms-2" href="{% url 'log_in' %}">Login</a>
 
                 <a class="btn btn-outline-success ms-2" href="{% url 'register' %}">Register</a>
 

@@ -25,7 +25,7 @@ html {
 }
 
 #main_site_buttons:hover {
-    transform:scale(1.05);
+    transform:scale(1.15);
     transition: 0.2s;
 }
 
@@ -59,19 +59,38 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
 }
 
 #logo:hover {
-    color: #b5b593;
-    transition: 0.6s;
+    color: #97977a;
+    transition: 0.4s;
 }
 
 #table_cell_centered {
     vertical-align: middle;
-    padding: 30px;
+    padding: 10px;
 }
 
 #table_row_header {
     width: 200px;
     max-width: 200px;
     vertical-align: middle;
+}
+
+#date_input_container {
+    max-width: 170px;
+}
+
+.btn.btn-danger {
+    background-color: #AE445A !important;
+    outline-color: #AE445A !important;
+}
+
+.btn.btn-danger:hover {
+    background-color: #7f2f3f !important;
+    outline-color: #7f2f3f !important;
+}
+
+.btn.btn-danger:active {
+    background-color: #6f2332 !important;
+    outline-color: #6f2332 !important;
 }
 
 .form-container {

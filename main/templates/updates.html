@@ -146,7 +146,7 @@
     </table>
 <input type="hidden" name="_method" value="PATCH">
 </form>
-<div><u>Note</u>: Our system currently has minimum of 1 second accuracy, meaning if a stock price crosses <b>into</b> the selected range, and <b>out</b>,
+<div><u>Note</u>: Our system currently has minimum of 1 minute accuracy, meaning if a stock price crosses <b>into</b> the selected range, and <b>out</b>,
     <br/>in <b>less than a minute</b>, the subscription may not catch this bounce. this will improve in the future (into real-time.)</div>    
 </div>
 
@@ -182,6 +182,7 @@
             client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_current_stock_price', data, function(response) {
                 let res = JSON.parse(response);
                 let parsed_data = JSON.parse(res['data']);
+                console.log(`res['data'].toString() = ${res['data'].toString()}`);
                 let keys_as_nums = Object.keys(parsed_data['Close']).map((x) => Number(x));
                 let lastPrice = parsed_data['Close'][keys_as_nums[keys_as_nums.length - 1].toString()];
                 document.getElementById("bound_val").value = formatNumToFixed(lastPrice, 3);

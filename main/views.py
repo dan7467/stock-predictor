@@ -100,6 +100,10 @@ def get_stock_data(request):
     ticker = body.get('stock_symbol')
     start_date = body.get('from_date')
     end_date = body.get('to_date')
+    if start_date == 'ALL' and ticker:
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_all_stock_data(ticker).to_json()})
+    if start_date == end_date == datetime.now().strftime('%Y-%m-%d'):
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_current_day_stock_info(ticker).to_json()})
     dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
     if ticker and start_date and end_date and dates_valid:
         return JsonResponse({"status": "success", "data": stock_data_handler.fetch_data(ticker, start_date, end_date).to_json()})
@@ -171,7 +175,7 @@ def register(request):
             
     return render(request, 'register.html')
 
-def login(request):
+def log_in(request):
     if request.method == 'POST':
         
         username = request.POST['username']
@@ -188,6 +192,6 @@ def login(request):
     return render(request, 'login.html')
 
 @login_required
-def logout(request):
+def log_out(request):
     logout(request)
     return redirect('home')
