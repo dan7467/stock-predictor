@@ -6,10 +6,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 import pandas as pd
+import tensorflow as tf
 from datetime import datetime
+
+# configure tensorflow to use GPU
+sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
 
 
 ###################################################################################################################################################
+
+# # Local testing, model still not generalized:
 
 resolution = 100
 interval_vals = [390, 195, 78, 26, 13, 7, 1, 0.2, 0.14, 0.03, 0.01]
