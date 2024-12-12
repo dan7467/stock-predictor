@@ -1,3 +1,5 @@
+let lastStockSymbolForCompanyInfo = '';
+
 function update_name() {
     document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
 }
@@ -536,6 +538,9 @@ function formatNumToFixed(num, decimals){
         if (is_number(s)) {  // if s is not a number, e.g. "USD", leave it untouched
             return s.toLocaleString("en-US", {style: "currency", currency: stock_currency});
         }
+        if (s == undefined) {
+            return 'No Info'
+        }
         return s;
     }
 
@@ -549,31 +554,40 @@ function formatNumToFixed(num, decimals){
     }
 
     function refreshCompanyInfo(stock_sym) {
-        if (stock_sym !== ''){
-            client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_company_info', {stock_symbol: stock_sym}, function(response) {
-                let res_parsed = JSON.parse(response)['data'];
-                let keys = Object.keys(res_parsed);
-                let stock_currency = res_parsed['financialCurrency'];
-                let relevant_keys = [['industry', 'sector', 'website', 'financialCurrency'], // each row should contain 4 keys
-                                    ['previousClose', 'open', 'dayLow', 'dayHigh'],
-                                    ['bid', 'ask', 'profitMargins', 'twoHundredDayAverage'],
-                                    ['totalCash', 'totalCashPerShare', 'totalDebt', 'freeCashflow'],
-                                    ['revenuePerShare', 'totalRevenue', 'dividendYield', 'shortRatio'],
-                                    ['returnOnEquity', 'operatingMargins', 'mostRecentQuarter', '52WeekChange']];
-                document.getElementById('company_info_container').innerHTML = `<h1>${res_parsed['longName']}</h2><br/> ${document.getElementById('company_info_container').innerHTML}`;
-                for (let row = 0; row < relevant_keys.length; row++) {
-                    document.getElementById('company_info').innerHTML += `<tr id="row_${row}"></tr>`;
-                    for (let property = 0; property < relevant_keys[row].length; property++){
-                        document.getElementById('row_'+row).innerHTML += `
-                            <td><b><u>${normalizeKey(relevant_keys[row][property])}</u></b>:</td><td>${normalizeValue(res_parsed[relevant_keys[row][property]], stock_currency)}</td>
-                        `;
+        if (stock_sym !== lastStockSymbolForCompanyInfo) {
+            document.getElementById('company_info_container').innerHTML = `
+                <table style="width: 100%; text-align: left;">
+                    <tbody id="company_info">
+                    </tbody>
+                </table>
+            `;
+            lastStockSymbolForCompanyInfo = stock_sym;
+            if (stock_sym !== ''){
+                client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_company_info', {stock_symbol: stock_sym}, function(response) {
+                    let res_parsed = JSON.parse(response)['data'];
+                    let keys = Object.keys(res_parsed);
+                    let stock_currency = res_parsed['financialCurrency'];
+                    let relevant_keys = [['industry', 'sector', 'website', 'financialCurrency'], // each row should contain 4 keys
+                                        ['previousClose', 'open', 'dayLow', 'dayHigh'],
+                                        ['bid', 'ask', 'profitMargins', 'twoHundredDayAverage'],
+                                        ['totalCash', 'totalCashPerShare', 'totalDebt', 'freeCashflow'],
+                                        ['revenuePerShare', 'totalRevenue', 'dividendYield', 'shortRatio'],
+                                        ['returnOnEquity', 'operatingMargins', 'mostRecentQuarter', '52WeekChange']];
+                    document.getElementById('company_info_container').innerHTML = `<h1>${res_parsed['longName']}</h2><br/> ${document.getElementById('company_info_container').innerHTML}`;
+                    for (let row = 0; row < relevant_keys.length; row++) {
+                        document.getElementById('company_info').innerHTML += `<tr id="row_${row}"></tr>`;
+                        for (let property = 0; property < relevant_keys[row].length; property++){
+                            document.getElementById('row_'+row).innerHTML += `
+                                <td><b><u>${normalizeKey(relevant_keys[row][property])}</u></b>:</td><td>${normalizeValue(res_parsed[relevant_keys[row][property]], stock_currency)}</td>
+                            `;
+                        }
                     }
-                }
-                document.getElementById('company_info_container').innerHTML += `<br/><br/><div>${res_parsed['longBusinessSummary']}</div>`;
-            });
-        }
-        else {
-            console.log("Can't retrieve company info: stock symbol is not valid.");
+                    document.getElementById('company_info_container').innerHTML += `<br/><br/><div>${res_parsed['longBusinessSummary'] == undefined ? 'No description exists for this stock symbol.' : res_parsed['longBusinessSummary']}</div>`;
+                });
+            }
+            else {
+                console.log("Can't retrieve company info: stock symbol is not valid.");
+            }
         }
     }
 
@@ -624,6 +638,7 @@ function formatNumToFixed(num, decimals){
             };
             client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
                 refreshStockData(response, sym);
+                refreshCompanyInfo(sym);
             });
         } else {
             alert('Error: No stock symbol input');
