@@ -26,8 +26,8 @@ function getStockData() {
             to_date: document.getElementById('date_end').value
         };
         client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
-            // TO-DO: merge this refreshStockData(response, sym) function call with the function below (maybe move this one down there) for performance
             refreshStockData(response, sym);
+            refreshCompanyInfo(sym);
         });
     } else {
         alert('Error: No stock symbol input');
@@ -487,20 +487,9 @@ function formatNumToFixed(num, decimals){
 
     [...document.getElementsByTagName('select')].forEach(element => element.addEventListener('change', update));
 
-    // window.addEventListener('load', () => {
-    //     chart.config.data.datasets[1].hidden = document.getElementById('mixed').value == 'true' ? false : true;
-    //     chart.update();
-    //     getStockData();
-    // });
-
     function refreshStockData(new_stock_data, stock_symbol) {
-        // TO-DO: optimization for long time ranges - less sampling & more distance between date samples.
-        //                              (maybe from: stock_data_query.py)
         let res = JSON.parse(new_stock_data);
         let parsed_data = JSON.parse(res['data']);
-        // res['data'].length(period_of_time):  5days: 650, 14days: 1772, 1Month: 3803, 6Month: 22441, 1Y: 44,646, 5Y: 222,841 
-        // ideally: 7,000 samples.
-        // if len >= 6Month, narrow it down to 7,000: 
         if (
             res['status'] !== 'success' || 
             !(`('Open', '${stock_symbol}')` in parsed_data) || 
@@ -539,6 +528,55 @@ function formatNumToFixed(num, decimals){
         }
     }
 
+    function is_number(s) {
+        return /^\d+$/.test(s);
+    }
+
+    function normalizeValue(s, stock_currency) {
+        if (is_number(s)) {  // if s is not a number, e.g. "USD", leave it untouched
+            return s.toLocaleString("en-US", {style: "currency", currency: stock_currency});
+        }
+        return s;
+    }
+
+    function normalizeKey(s) {
+        if (!s || typeof s !== "string") {
+            return ""; // Handle invalid input
+        }
+        const spaced = s.replace(/([a-z])([A-Z])/g, "$1 $2");
+        const capitalized = spaced.replace(/\b\w/g, (char) => char.toUpperCase());
+        return capitalized;
+    }
+
+    function refreshCompanyInfo(stock_sym) {
+        if (stock_sym !== ''){
+            client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_company_info', {stock_symbol: stock_sym}, function(response) {
+                let res_parsed = JSON.parse(response)['data'];
+                let keys = Object.keys(res_parsed);
+                let stock_currency = res_parsed['financialCurrency'];
+                let relevant_keys = [['industry', 'sector', 'website', 'financialCurrency'], // each row should contain 4 keys
+                                    ['previousClose', 'open', 'dayLow', 'dayHigh'],
+                                    ['bid', 'ask', 'profitMargins', 'twoHundredDayAverage'],
+                                    ['totalCash', 'totalCashPerShare', 'totalDebt', 'freeCashflow'],
+                                    ['revenuePerShare', 'totalRevenue', 'dividendYield', 'shortRatio'],
+                                    ['returnOnEquity', 'operatingMargins', 'mostRecentQuarter', '52WeekChange']];
+                document.getElementById('company_info_container').innerHTML = `<h1>${res_parsed['longName']}</h2><br/> ${document.getElementById('company_info_container').innerHTML}`;
+                for (let row = 0; row < relevant_keys.length; row++) {
+                    document.getElementById('company_info').innerHTML += `<tr id="row_${row}"></tr>`;
+                    for (let property = 0; property < relevant_keys[row].length; property++){
+                        document.getElementById('row_'+row).innerHTML += `
+                            <td><b><u>${normalizeKey(relevant_keys[row][property])}</u></b>:</td><td>${normalizeValue(res_parsed[relevant_keys[row][property]], stock_currency)}</td>
+                        `;
+                    }
+                }
+                document.getElementById('company_info_container').innerHTML += `<br/><br/><div>${res_parsed['longBusinessSummary']}</div>`;
+            });
+        }
+        else {
+            console.log("Can't retrieve company info: stock symbol is not valid.");
+        }
+    }
+
     function getRandomData(dateStr) {
         var date = luxon.DateTime.fromRFC2822(dateStr);
 
@@ -551,37 +589,10 @@ function formatNumToFixed(num, decimals){
             }
         }
     }
-
-    function narrowDown(data) { // TO-DO: move this logic to backend, to happen at stock_data_query
-        const keys = Object.keys(data);
-        const timestamps = Object.keys(data[keys[0]]);
-        const totalLength = timestamps.length;
-        if (totalLength <= resolution) {
-            return data;
-        }
-        const interval = Math.ceil(totalLength / resolution);
-    
-        // Select timestamps to keep (every 'interval'th timestamp)
-        const sampledTimestamps = timestamps.filter((_, index) => index % interval === 0);
-    
-        // Create a new object with only the sampled timestamps for each key
-        const narrowedData = {};
-        keys.forEach((key) => {
-            narrowedData[key] = {};
-            sampledTimestamps.forEach((timestamp) => {
-                narrowedData[key][timestamp] = data[key][timestamp];
-            });
-        });
-    
-        return narrowedData;
-    }
-    
-
     function getTodaysDateStr() {  // formatted: YYYY-MM-DD
         var today = new Date();
         return today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
     }
-
     function subtractDaysFromToday(daysToSubtract) {
         Date.prototype.subtractDays = function (d) {
             this.setDate(this.getDate() - d);
@@ -589,26 +600,22 @@ function formatNumToFixed(num, decimals){
         }
         return new Date().subtractDays(daysToSubtract).toISOString().split('T')[0];
     }
-
     function autoDate(days_ago) {
         let sym = document.getElementById('stock_sym').value;
         let date_start = document.getElementById('date_start');
         let date_end = document.getElementById('date_end');
         let all_data = false;
         // TO-DO: fix "Today"-button's bug.
-        console.log(days_ago);
         if (days_ago != '1826') {
             date_start.value = subtractDaysFromToday(Number(days_ago));
         }
         else if (days_ago === '0') {
             date_start.value = getTodaysDateStr();
-            console.log("OK!");
         }
         else {
             all_data = true; 
         }
         date_end.value = getTodaysDateStr();
-        console.log(`\n\n\n start = ${date_start.value}, end = ${date_end.value}`);
         if (sym !== '') {
             const data = {
                 stock_symbol: sym,

@@ -17,15 +17,23 @@ class StockData:
             return "1mo"
         else:
             return "1wk"
+        
+    def fetch_company_info(self, ticker):
+        return yf.Ticker(ticker).info
             
     def fetch_data(self, ticker, start_date, end_date):
+        first_trade_epoch_utc_date = int(self.fetch_company_info(ticker)['firstTradeDateEpochUtc'])
         total_days = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days
+        if total_days < 1:
+            return self.fetch_current_day_stock_info(ticker)
+        if 1 <= total_days < 32:
+            return yf.download(ticker, start=start_date, end=end_date, interval="1h")
         if total_days > self.resolution:
             return yf.download(ticker, start=start_date, end=end_date, interval=self.calc_resolution(total_days))
         return yf.download(ticker, start=start_date, end=end_date)
     
     def fetch_all_stock_data(self, ticker):
-        first_trade_epoch_utc_date = int(yf.Ticker(ticker).info['firstTradeDateEpochUtc'])
+        first_trade_epoch_utc_date = int(self.fetch_company_info(ticker)['firstTradeDateEpochUtc'])
         date_diff_in_years = (datetime.now() - datetime.fromtimestamp(first_trade_epoch_utc_date)).days / 365.25
         return yf.download(ticker, period="max", auto_adjust=False, interval=self.getIntervalFromNumOfYears(date_diff_in_years))
     

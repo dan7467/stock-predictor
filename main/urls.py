@@ -9,6 +9,7 @@ urlpatterns = [
     path('stocks/', views.stocks, name='stocks'),
     path('updates/', views.updates, name='updates'),
     path('get_stock_data', views.get_stock_data, name='get_stock_data'),
+    path('get_company_info', views.get_company_info, name='get_company_info'),
     path('get_current_stock_price', views.get_current_stock_price, name='get_current_stock_price'),
     path('register/', views.register, name='register'),
     path('log_in/', views.log_in, name='log_in'),

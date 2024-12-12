@@ -111,6 +111,16 @@ def get_stock_data(request):
 
 @login_required
 @csrf_exempt
+@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+def get_company_info(request):
+    body = json.loads(request.body)
+    ticker = body.get('stock_symbol')
+    if ticker:
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_company_info(ticker)})
+    return JsonResponse({"status": "error", "message": "No Symbol was entered."}, status=400)
+
+@login_required
+@csrf_exempt
 @require_http_methods(["POST", "GET"])
 def stocks(request):
     last_action_timestamp_update(request)

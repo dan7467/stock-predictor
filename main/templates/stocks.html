@@ -34,25 +34,25 @@
     </div>
     
     <table>
-        <thead>
-            <tr>
-                <td><label for="stock_sym" class="form-label">Stock Symbol: </label></td>
-                <td></td>
-                <td><label for="date" class="form-label">From: </label></td>
-                <td></td>
-                <td><label for="date" class="form-label">To: </label></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </thead>
         <tbody>
+        <tr>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('0')">Today</button></td>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('5')">5 days</button></td>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('14')">14 days</button>&emsp;&emsp;&emsp;&emsp;
+                <button type="button" class="btn btn-secondary" onclick="autoDate('31')">Month</button></td>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('182')">6 months</button></td>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('365')">1 Year</button>&emsp;&emsp;&emsp;&emsp;
+                <button type="button" class="btn btn-secondary" onclick="autoDate('1825')">5 Years</button></td>
+            <td><button type="button" class="btn btn-secondary" onclick="autoDate('1826')">Max</button></td>
+        </tr>
+        <tr><td></td></tr>
         <tr>
             <td>
                 <div class="mb-3" id="table_cell_centered">
                     {% if chosen_stock_name %}
-                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" value="{{ chosen_stock_name }}" list="my_stocks_list" required>
+                        <input type="text" placeholder="Symbol (e.g. 'MSFT')" class="form-control" id="stock_sym" name="stock_sym" value="{{ chosen_stock_name }}" list="my_stocks_list" required>
                     {% else %}
-                        <input type="text" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
+                        <input type="text" placeholder="Symbol (e.g. 'AAPL')" class="form-control" id="stock_sym" name="stock_sym" list="my_stocks_list" required>
                     {% endif %}
                     <datalist id="my_stocks_list">
                         {% if my_stocks %}
@@ -63,13 +63,13 @@
                     </datalist>
                 </div>
             </td>
-            <td></td>
+            <td><label for="date" class="form-label">From: </label></td>
             <td>
                 <div class="mb-3" id="table_cell_centered">
                     <input type="date" id="date_start" name="date_start" value="2024-11-10" />
                 </div>
             </td>
-            <td></td>
+            <td><label for="date" class="form-label">To: </label></td>
             <td>
                 <div class="mb-3" id="table_cell_centered">
                     <input type="date" id="date_end" name="date_end" value="2024-12-06" />
@@ -82,22 +82,28 @@
                 <form method="POST">
                     <input type="hidden" name="_method" value="PATCH">
                     <input type="hidden" name="_symbol" id="_symbol" value="">
-                    <button type="submit" onclick="update_name()" class="btn btn-info">Save Stock</button>
+                    <button type="submit" onclick="update_name()" class="btn btn-primary">Save Stock</button>
                 </form>
             </td>
         </tr>
         <tr>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('0')">Today</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('5')">5 days</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('14')">14 days</button>&emsp;&emsp;&emsp;&emsp;
-                <button type="button" class="btn btn-secondary" onclick="autoDate('31')">Month</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('182')">6 months</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('365')">1 Year</button>&emsp;&emsp;&emsp;&emsp;
-                <button type="button" class="btn btn-secondary" onclick="autoDate('1825')">5 Years</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('1826')">Max</button></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </tbody>
     </table>
+
+    <div id="company_info_container">
+        <table style="width: 100%; text-align: left;">
+            <tbody id="company_info">
+            </tbody>
+        </table>
+    </div>
 
     {% load static %}
     <script src="{% static 'adjusted_chart_js.js' %}" type="text/javascript"></script>
