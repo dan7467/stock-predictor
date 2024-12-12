@@ -1,109 +1,117 @@
-from autogluon.tabular import TabularPredictor
-import pandas as pd
+from keras.models import Sequential
+from keras.layers import Dense, LSTM
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+import matplotlib.pyplot as plt
 import yfinance as yf
+from datetime import datetime
 
-class Predictor:
-    
-    def __init__(self, train_data):  # consider adding more features for better tabular regression, like season, wars per year, etc.
-        self.train_data = pd.DataFrame(train_data, columns=["timestamp", "price"])
-        subsample_size = 5000
-        if subsample_size is not None and subsample_size < len(self.train_data):
-            self.train_data = self.train_data.sample(n=subsample_size, random_state=0)
-        tabpfnmix_default = {
-            "model_path_classifier": "autogluon/tabpfn-mix-1.0-classifier",
-            "model_path_regressor": "autogluon/tabpfn-mix-1.0-regressor",
-            "n_ensembles": 1,
-            "max_epochs": 10,  # was 30
-        }
 
-        self.hyperparameters = {
-            "TABPFNMIX": [
-                tabpfnmix_default,
-            ],
-        }
+###################################################################################################################################################
 
-        label = "price"
-        problem_type = "regression"
-
-        self.predictor = TabularPredictor(
-            label=label,
-            problem_type=problem_type,
-        )
-    
-    def fit(self, train_data, label):  # consider adding more features for better tabular regression, like season, wars per year, etc.
-        self.predictor.fit(
-            train_data=self.train_data,
-            hyperparameters=self.hyperparameters,
-            raise_on_no_models_fitted=False,
-            verbosity=3,
-            ag_args_fit={"ag.max_memory_usage_ratio": 0.3}  # <- use only 30% of the memory, remove this when migrating to cloud
-        )
+resolution = 100
+interval_vals = [390, 195, 78, 26, 13, 7, 1, 0.2, 0.14, 0.03, 0.01]
+interval_keys = ["1m", "2m", "5m", "15m", "30m", "1h", "1d", "5d", "1wk", "1mo", "3mo"]
         
+def fetch_data(ticker, start_date, end_date):
+    # first_trade_epoch_utc_date = int(yf.Ticker(ticker).info['firstTradeDateEpochUtc'])
+    # total_days = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days
+    # if total_days < 32:
+    #     return yf.download(ticker, start=start_date, end=end_date, interval="1h")
+    # if total_days > resolution:
+    #     return yf.download(ticker, start=start_date, end=end_date, interval=calc_resolution(total_days))
+    return yf.download(ticker, start=start_date, end=end_date)
 
-    def predict(self, test_data):  # consider adding more features for better tabular regression, like season, wars per year, etc.
-        # self.test_data = pd.DataFrame(test_data, columns=["timestamp", "price"])
-        return self.predictor.predict(test_data)
-
+def calc_resolution(total_days):
+    for i in range(len(interval_vals)):
+        if total_days * interval_vals[i] <= resolution:
+            return interval_keys[i]
         
-    
-    
-def fetch_data_as_list(ticker, start_date, end_date, x_axis_property, y_axis_property, training=False):
-    # Fetch data from Yahoo Finance
-    if training:
-        data = yf.download(ticker, period="max", auto_adjust=False)
-    else:
-        data = yf.download(ticker, start=start_date, end=end_date)
-    
-    # Reset index to make the Date index a column
-    data = data.reset_index()
-    
-    # Handle MultiIndex in columns
-    if isinstance(data.columns, pd.MultiIndex):
-        # Flatten the MultiIndex by joining levels with an underscore
-        data.columns = ['_'.join(filter(None, col)).strip() for col in data.columns]
-    
-    # Fix the x_axis_property if it's 'Date', as it doesn't follow the MultiIndex flattening
-    if x_axis_property == 'Date':
-        x_axis_property = 'Date'
+###################################################################################################################################################
 
-    # Adjust the y_axis_property to include the ticker suffix
-    y_axis_property = f"{y_axis_property}_{ticker}"
-    
-    # Check if columns exist
-    if x_axis_property not in data.columns:
-        raise KeyError(f"Column '{x_axis_property}' not found in the fetched data. Available columns: {data.columns}")
+df = fetch_data('AAPL', '2010-01-01', '2024-12-12')
 
-    if y_axis_property not in data.columns:
-        raise KeyError(f"Column '{y_axis_property}' not found in the fetched data. Available columns: {data.columns}")
-    
-    # Convert the desired columns to a dictionary of lists
-    data_dict_of_two_lists = data[[x_axis_property, y_axis_property]].to_dict(orient='list')
-    
-    # Return list of tuples
-    return list(zip(
-        map(lambda ts: ts.strftime("%m/%d/%Y, %H:%M:%S") if isinstance(ts, pd.Timestamp) else ts,
-            data_dict_of_two_lists[x_axis_property]),
-        data_dict_of_two_lists[y_axis_property]
-    ))
+# Extract 'Close' data and convert to a DataFrame for compatibility
+data = df[['Close']]  # Ensures 'Close' remains a DataFrame
 
-# Main script
-if __name__ == "__main__":
-    
-    train_data = fetch_data_as_list('MSFT', '2023-01-01', '2024-01-01', 'Date', 'Close', True)
-    
-    predictor = Predictor(train_data)
-    
-    predictor.fit(train_data, label="Close")
-    
-    # Fetch data and prepare it as a DataFrame
-    fetched_data = fetch_data_as_list('MSFT', '2023-01-01', '2024-01-01', 'Date', 'Close')
-    test_data = pd.DataFrame(fetched_data, columns=['timestamp', 'Close'])
-    
-    # Generate predictions
-    predictions = predictor.predict(test_data)
+# Convert the DataFrame to a numpy array
+dataset = data.values
 
-    # Save predictions to a CSV file (optional)
-    predictions.to_csv("predicted_values.csv", index=False)
+# Get the number of rows to train the model on
+training_data_len = int(np.ceil(len(dataset) * .95))
 
-    # Print predictions
-    print(predictions)
+# Scale the data
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(dataset)
+
+# Create the training data set
+train_data = scaled_data[:training_data_len, :]
+
+# Validate train_data size
+if len(train_data) < 60:
+    raise ValueError("Not enough data for training. Ensure the dataset is sufficiently large.")
+
+# Split the data into x_train and y_train
+x_train, y_train = [], []
+for i in range(60, len(train_data)):
+    x_train.append(train_data[i-60:i, 0])
+    y_train.append(train_data[i, 0])
+
+# Convert to numpy arrays
+x_train, y_train = np.array(x_train), np.array(y_train)
+
+# Reshape x_train for LSTM
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+
+# Build the LSTM model
+model = Sequential()
+model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(64, return_sequences=False))
+model.add(Dense(25))
+model.add(Dense(1))
+
+# Compile the model
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Train the model
+model.fit(x_train, y_train, batch_size=1, epochs=1)
+
+# Create the testing data set
+test_data = scaled_data[training_data_len - 60:, :]
+
+# Validate test_data size
+if len(test_data) < 60:
+    raise ValueError("Not enough data for testing. Ensure the dataset is sufficiently large.")
+
+# Split the data into x_test and y_test
+x_test = []
+y_test = dataset[training_data_len:, :]
+for i in range(60, len(test_data)):
+    x_test.append(test_data[i-60:i, 0])
+
+# Convert x_test to numpy array and reshape
+x_test = np.array(x_test)
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+# Get the model's predicted price values
+predictions = model.predict(x_test)
+predictions = scaler.inverse_transform(predictions)
+
+# Calculate the root mean squared error (RMSE)
+rmse = np.sqrt(np.mean((predictions - y_test) ** 2))
+print(f"RMSE: {rmse}")
+
+# Prepare for plotting
+train = data[:training_data_len]
+valid = data[training_data_len:].copy()
+valid['Predictions'] = predictions
+
+# Plot the data
+plt.figure(figsize=(16, 6))
+plt.title('Model')
+plt.xlabel('Date', fontsize=18)
+plt.ylabel('Close Price USD ($)', fontsize=18)
+plt.plot(train, label='Train')
+plt.plot(valid[['Close', 'Predictions']], label='Val & Predictions')
+plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
+plt.show()
