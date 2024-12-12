@@ -1,4 +1,9 @@
-env/
+main/__pycache__/*
+stocks_app/__pycache__/*
+main/migrations/__pycache__/*
 **/__pycache__/
 __pycache__/
 *.pyc
+
+.env
+env/

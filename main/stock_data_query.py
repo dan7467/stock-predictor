@@ -1,6 +1,6 @@
 import yfinance as yf
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import math
 
 class StockData:
@@ -22,7 +22,6 @@ class StockData:
         return yf.Ticker(ticker).info
             
     def fetch_data(self, ticker, start_date, end_date):
-        first_trade_epoch_utc_date = int(self.fetch_company_info(ticker)['firstTradeDateEpochUtc'])
         total_days = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days
         if total_days < 1:
             return self.fetch_current_day_stock_info(ticker)
@@ -30,7 +29,10 @@ class StockData:
             return yf.download(ticker, start=start_date, end=end_date, interval="1h")
         if total_days > self.resolution:
             return yf.download(ticker, start=start_date, end=end_date, interval=self.calc_resolution(total_days))
-        return yf.download(ticker, start=start_date, end=end_date)
+        return yf.download(ticker, start=start_date, end=end_date)   
+
+    def min_interval_fetch_data(self, ticker, start_date, end_date=datetime.now(timezone.utc).date()):
+        return yf.download(ticker, start=start_date, end=end_date, interval="1m")
     
     def fetch_all_stock_data(self, ticker):
         first_trade_epoch_utc_date = int(self.fetch_company_info(ticker)['firstTradeDateEpochUtc'])
