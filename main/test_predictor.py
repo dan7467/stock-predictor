@@ -1,9 +1,11 @@
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
+from keras.callbacks import EarlyStopping
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+import pandas as pd
 from datetime import datetime
 
 
@@ -40,78 +42,73 @@ dataset = data.values
 # Get the number of rows to train the model on
 training_data_len = int(np.ceil(len(dataset) * .95))
 
-# Scale the data
+# Scale data
 scaler = MinMaxScaler(feature_range=(0, 1))
-scaled_data = scaler.fit_transform(dataset)
+scaled_data = scaler.fit_transform(data[['Close']].values)
 
-# Create the training data set
-train_data = scaled_data[:training_data_len, :]
+# Training data length (93%)
+training_data_len = int(len(scaled_data) * 0.93)
 
-# Validate train_data size
-if len(train_data) < 60:
-    raise ValueError("Not enough data for training. Ensure the dataset is sufficiently large.")
+# Split data into training and last 60 days for prediction
+train_data = scaled_data[:training_data_len]
+test_data = scaled_data[training_data_len - 60:]  # Keep last 60 days as test input
 
-# Split the data into x_train and y_train
+# Prepare x_train, y_train
 x_train, y_train = [], []
 for i in range(60, len(train_data)):
-    x_train.append(train_data[i-60:i, 0])
+    x_train.append(train_data[i - 60:i, 0])  # Use past 60 days to predict the next value
     y_train.append(train_data[i, 0])
 
-# Convert to numpy arrays
 x_train, y_train = np.array(x_train), np.array(y_train)
-
-# Reshape x_train for LSTM
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-# Build the LSTM model
+# Build LSTM model
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-model.add(LSTM(64, return_sequences=False))
+model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))  # used to be 128 instead of 50
+model.add(LSTM(64, return_sequences=False))  # used to be 64 instead of 25
 model.add(Dense(25))
 model.add(Dense(1))
 
-# Compile the model
+# Early stop (if the loss function stops improving)
+early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+
+# Compile and train
 model.compile(optimizer='adam', loss='mean_squared_error')
+model.fit(x_train, y_train, batch_size=32, epochs=40, callbacks=[early_stop])
 
-# Train the model
-model.fit(x_train, y_train, batch_size=1, epochs=1)
+# Predict the next 7% (future prices)
+future_predictions = []
 
-# Create the testing data set
-test_data = scaled_data[training_data_len - 60:, :]
+# FIXES
+input_data = scaler.transform(data['Close'].values[-60:].reshape(-1, 1))
 
-# Validate test_data size
-if len(test_data) < 60:
-    raise ValueError("Not enough data for testing. Ensure the dataset is sufficiently large.")
+for _ in range(int(len(scaled_data) * 0.07)):  # Predict 7% of the dataset length
+    input_reshaped = np.reshape(input_data, (1, input_data.shape[0], 1))
+    predicted_value = model.predict(input_reshaped)[0, 0]
+    future_predictions.append(predicted_value)
 
-# Split the data into x_test and y_test
-x_test = []
-y_test = dataset[training_data_len:, :]
-for i in range(60, len(test_data)):
-    x_test.append(test_data[i-60:i, 0])
+    # Update input_data with the predicted value
+    input_data = np.append(input_data, predicted_value)[1:]  # Shift window forward
 
-# Convert x_test to numpy array and reshape
-x_test = np.array(x_test)
-x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+# Transform predictions back to original scale
+future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
 
-# Get the model's predicted price values
-predictions = model.predict(x_test)
-predictions = scaler.inverse_transform(predictions)
-
-# Calculate the root mean squared error (RMSE)
-rmse = np.sqrt(np.mean((predictions - y_test) ** 2))
-print(f"RMSE: {rmse}")
-
-# Prepare for plotting
+# Prepare data for visualization
 train = data[:training_data_len]
-valid = data[training_data_len:].copy()
-valid['Predictions'] = predictions
+valid = data[training_data_len:]
+valid['Predictions'] = np.nan  # No predictions for past validation data
 
-# Plot the data
+# Append future predictions to the dataset for plotting
+future_dates = pd.date_range(data.index[-1], periods=len(future_predictions) + 1, freq='B')[1:]
+future_df = pd.DataFrame({'Close': np.nan, 'Predictions': future_predictions.flatten()}, index=future_dates)
+
+# Plot the results
 plt.figure(figsize=(16, 6))
-plt.title('Model')
+plt.title('Stock Price Prediction Model')
 plt.xlabel('Date', fontsize=18)
 plt.ylabel('Close Price USD ($)', fontsize=18)
-plt.plot(train, label='Train')
-plt.plot(valid[['Close', 'Predictions']], label='Val & Predictions')
-plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
+plt.plot(train['Close'], label='Train Data')
+plt.plot(valid['Close'], label='Validation Data (Actual)')
+plt.plot(future_df['Predictions'], label='Future Predictions', linestyle='--')
+plt.legend()
 plt.show()
