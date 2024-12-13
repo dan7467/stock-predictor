@@ -33,7 +33,11 @@
                 <tr>
                     <td id="table_row_header"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
                     <td><h4 id="${coin_symbol}_price" style="color: #66ff33;"></h4></td>
-                    <td id="table_row_header"><button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button</td>
+                    <td id="table_row_header">
+                        <a href="/coin_plotter?requested_coin=${coin_symbol}" style="text-decoration:none;">
+                            <button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button>
+                        </a>
+                    </td>
                 </tr>
                 `;
                 coins_added[coin_symbol] = true;

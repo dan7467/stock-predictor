@@ -52,6 +52,9 @@ def about(request):
 
 def live_crypto(request):
     return render(request, 'live_crypto.html')
+
+def coin_plotter(request):
+    return render(request, 'coin_plotter.html')
     
 @login_required
 def updates(request):
