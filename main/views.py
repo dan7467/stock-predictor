@@ -50,8 +50,8 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
-def to_crypto_orbit(request):
-    return render(request, 'to_crypto_orbit.html')
+def live_crypto(request):
+    return render(request, 'live_crypto.html')
     
 @login_required
 def updates(request):

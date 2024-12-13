@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1><u>Real-time Crypto Prices</u></h1>
+<br/><br/><br/>
+
+<div id="prices_container"> <div id="loading_status">Loading...</div>
+    <table class="table table-bordered">
+        <tbody id="prices_table_body">
+        <tbody>
+    </table>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script language="javascript">
+    function normalizePrice(s) {
+        return Number(s).toLocaleString("en-US", {style: "currency", currency: "USD"});
+    }
+    
+    function normalizeCoinName(s) {
+        return (s.charAt(0)+'').toUpperCase() + s.substring(1);
+    }
+
+    const ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,monero,litecoin,solana,tether,cardano');
+    let coins_added = {};
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        for (let coin_symbol in data) {
+            if (!(coin_symbol in coins_added)) {
+                document.getElementById('prices_table_body').innerHTML += `
+                <tr>
+                    <td id="table_row_header"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
+                    <td><h4 id="${coin_symbol}_price" style="color: #66ff33;"></h4></td>
+                    <td id="table_row_header"><button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button</td>
+                </tr>
+                `;
+                coins_added[coin_symbol] = true;
+            }
+            document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
+            document.getElementById('loading_status').textContent = '';
+        }
+        // if (data.ethereum) {
+        //    document.getElementById('prices_container').textContent = `$${data.ethereum}`;
+        // }
+    };
+    ws.onclose = function() {
+        document.getElementById('eth_price').textContent = "Connection closed.";
+    };
+    ws.onopen = () => {
+        console.log('(WS.OnOpen) WebSocket connection established.');
+    };
+    ws.onerror = (error) => {
+        console.error('(WS.OnError) WebSocket error:', error);
+    };
+</script>
+</body>
+{% endblock %}
