@@ -1,9 +1,26 @@
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
-        console.log(coin_name);
+        const coin_recent_history = params.get('last_data');
         const socket = new WebSocket('wss://ws.coincap.io/prices?assets='+coin_name);
         const data = [];
         const max_graph_len = 150;
+
+        // TO-DO: gather the last 10 minutes' data of this coin, to init the graph with (and continue plotting from there)
+
+        var HttpClient = function() {
+            this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
+                var anHttpRequest = new XMLHttpRequest();
+                anHttpRequest.onreadystatechange = function() {
+                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                        aCallback(anHttpRequest.responseText);
+                };
+                anHttpRequest.open(requestType, aUrl, true);
+                anHttpRequest.setRequestHeader("Content-Type", "application/json"); // Set content type to JSON
+                anHttpRequest.send(JSON.stringify(data)); // Send data as JSON
+            };
+        };
+        
+        var client = new HttpClient();
 
         if (coin_name !== "") {
             document.getElementById('coin_title_and_price').innerHTML = `<div id="${coin_name}" class="price" style="font-size: 34px;">${coin_name.charAt(0).toUpperCase()}${coin_name.substring(1)} = <span id="${coin_name}-price">Loading...</span></div>`;
@@ -38,7 +55,6 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Setup Chart.js
             let ctx = document.getElementById('barChart').getContext('2d');
-            
             const config = {
                 type: 'line',
                 data: {
