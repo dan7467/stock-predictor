@@ -1,7 +1,7 @@
 :root {
-    --bg: #C1BAA1;
-    --navbar: #A59D84; 
-    --text: #black;
+    --bg: #03346E;
+    --navbar: #021526; 
+    --text: #E2E2B6;
 }
 
 /* overriding bootstrap btns: */
@@ -22,6 +22,13 @@ html {
 
 #main_site_buttons {
     color: var(--text);
+    background-color: #97977a;
+    border-radius: 10px;
+    margin-left: 10px;
+    background: radial-gradient(
+        var(--bg) 30%, 
+        var(--navbar) 70%
+    );
 }
 
 #main_site_buttons:hover {

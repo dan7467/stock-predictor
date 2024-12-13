@@ -30,7 +30,7 @@
 
                 {% endif %}
 
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'live_crypto' %}">Live</a></li>
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'live_crypto' %}">Realtime Crypto</a></li>
 
             </ul>
 
@@ -48,59 +48,10 @@
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="btn btn-outline-primary ms-2" href="{% url 'my_profile' %}">My Profile</a>
                         <br/><br/>
-                        <a class="btn btn-outline-dark ms-2" onclick="toggle_dark_theme()">Dark theme</a>
-                        <br/><br/>
                         <a class="btn btn-outline-danger ms-2" href="{% url 'log_out' %}">Logout</a>
                         
                     </div>
                 </div>
-
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                        const root = document.querySelector(":root");
-                        const isDarkTheme = "{{ request.session.dark_theme }}" === "on";
-                
-                        if (isDarkTheme) {
-                            root.style.setProperty("--bg", "#03346E");
-                            root.style.setProperty("--navbar", "#021526");
-                            root.style.setProperty("--text", "#E2E2B6");
-                        } else {
-                            root.style.setProperty("--bg", "#C1BAA1");
-                            root.style.setProperty("--navbar", "#A59D84");
-                            root.style.setProperty("--text", "black");
-                        }
-                    });
-                </script>
-
-                <script>
-                    function toggle_dark_theme() {
-                            const rootStyles = getComputedStyle(document.querySelector(":root"));
-                            let dark_theme;
-                            if (rootStyles.getPropertyValue("--bg") == "#C1BAA1") {
-                                document.querySelector(":root").style.setProperty("--bg", "#03346E");
-                                document.querySelector(":root").style.setProperty("--navbar", "#021526");
-                                document.querySelector(":root").style.setProperty("--text", "#E2E2B6");
-                                dark_theme = "on";
-                            } else {
-                                document.querySelector(":root").style.setProperty("--bg", "#C1BAA1");
-                                document.querySelector(":root").style.setProperty("--navbar", "#A59D84");
-                                document.querySelector(":root").style.setProperty("--text", "black");
-                                dark_theme = "off";
-                            }
-                            fetch("{% url 'toggle_dark_theme' %}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/x-www-form-urlencoded",
-                                    "X-CSRFToken": "{{ csrf_token }}",
-                                },
-                                body: `dark_theme=${dark_theme}`,
-                            })
-                            .then((response) => response.json())
-                            .catch((error) => {
-                                console.error("Error updating session:", error);
-                            });
-                        }
-                </script>
 
             {% else %}
 

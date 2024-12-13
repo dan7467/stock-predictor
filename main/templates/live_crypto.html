@@ -45,11 +45,12 @@
                 coin_price_buffer[coin_symbol] = [[Date.now(), data[coin_symbol]]];
             }
             else {
+                document.getElementById(coin_symbol+'_price').style.color = data[coin_symbol] > coin_price_buffer[coin_symbol][coin_price_buffer[coin_symbol].length - 1][1] ? "#66ff33" : "#ff1a1a";
                 coin_price_buffer[coin_symbol].push([Date.now(), data[coin_symbol]]);
             }
             document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
             document.getElementById('loading_status').textContent = '';
-            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/coin_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer['ethereum']))}`);
+            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/coin_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
         }
         // if (data.ethereum) {
         //    document.getElementById('prices_container').textContent = `$${data.ethereum}`;

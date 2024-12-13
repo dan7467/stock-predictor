@@ -10,7 +10,7 @@
             data.push({x: coin_recent_history[i][0], y: parseFloat(coin_recent_history[i][1])});
         }
         const max_graph_len = 150;
-
+        // TO-DO: find a decent API (best to adjust to Binance's API) and replace 'last_data' with actual last 5 minutes of data
         if (coin_name !== "") {
             document.getElementById('coin_title_and_price').innerHTML = `<div id="${coin_name}" class="price" style="font-size: 34px;">${coin_name.charAt(0).toUpperCase()}${coin_name.substring(1)} = <span id="${coin_name}_price">Loading...</span></div>`;
         }

@@ -14,16 +14,6 @@ from . import notifications
 
 stock_data_handler = StockData()
 
-# TO-DO 1.1: create a settings page, which the dark_mode will be toggled from
-# TO-DO 1.2: on every login/logout - take the current value of dark_theme (session variable) and update in db, for persistence
-@login_required
-def toggle_dark_theme(request):
-    last_action_timestamp_update(request)
-    if request.method == "POST":
-        request.session["dark_theme"] = request.POST.get("dark_theme")
-        return JsonResponse({"status": "success", "dark_theme": request.session["dark_theme"]})
-    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
-
 @login_required
 def last_action_timestamp_update(request):
     profile = CustomUser.objects.get(username=request.user.username)
@@ -64,6 +54,7 @@ def updates(request):
         stock_symbol = request.POST.get('stock_sym', False)     
         directive = request.POST.get('price_direction', False)
         directive_value = request.POST.get('bound_val', False)   
+        # create a new subscription:
         if request.POST.get('_method') == 'PATCH': 
             timestamp = datetime.now(timezone.utc).strftime("%H:%M:%S, %d.%m.%y")
             if stock_symbol and directive and directive_value and stock_symbol not in profile.user_updates and stock_data_handler.check_if_symbol_exists(stock_symbol):
@@ -74,6 +65,7 @@ def updates(request):
                 except Exception as e:
                     return JsonResponse({f"status": "error", "message": "Error occurred while creating subscription"})
             return JsonResponse({"status": "error", "message": "Error: Stock already subscripted to, or doesn't exist"})
+        # delete existing subscription:
         elif request.POST.get('_method') == 'DELETE':
             if stock_symbol and directive and directive_value and stock_symbol in profile.user_updates:
                 try:
