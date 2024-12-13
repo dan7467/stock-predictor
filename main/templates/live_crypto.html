@@ -25,40 +25,35 @@
     }
 
     const ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,monero,litecoin,solana,tether,cardano');
-    let coins_history = {};
+    let coin_price_buffer = {};
 
     ws.onmessage = function(event) {
         const data = JSON.parse(event.data);
         for (let coin_symbol in data) {
-            if (!(coin_symbol in coins_history)) {
+            if (!(coin_symbol in coin_price_buffer)) {
                 document.getElementById('prices_table_body').innerHTML += `
                 <tr>
                 <td id="table_row_header"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
                 <td><h4 id="${coin_symbol}_price" style="color: #66ff33;"></h4></td>
                 <td id="table_row_header">
-                    <a href="/coin_plotter?requested_coin=${coin_symbol}" style="text-decoration:none;">
+                    <a id="${coin_symbol}_plotter_link" href="/coin_plotter?requested_coin=${coin_symbol}&last_data=[]" style="text-decoration:none;">
                         <button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button>
                     </a>
                 </td>
                 </tr>
                 `;
-                coins_history[coin_symbol] = [[Date.now(), data[coin_symbol]]];
+                coin_price_buffer[coin_symbol] = [[Date.now(), data[coin_symbol]]];
             }
             else {
-                coins_history[coin_symbol].push([Date.now(), data[coin_symbol]]);
+                coin_price_buffer[coin_symbol].push([Date.now(), data[coin_symbol]]);
             }
             document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
             document.getElementById('loading_status').textContent = '';
+            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/coin_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer['ethereum']))}`);
         }
         // if (data.ethereum) {
         //    document.getElementById('prices_container').textContent = `$${data.ethereum}`;
         // }
-    };
-    ws.onclose = function() {
-        document.getElementById('eth_price').textContent = "Connection closed.";
-    };
-    ws.onopen = () => {
-        console.log('(WS.OnOpen) WebSocket connection established.');
     };
     ws.onerror = (error) => {
         console.error('(WS.OnError) WebSocket error:', error);

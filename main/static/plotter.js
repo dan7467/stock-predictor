@@ -1,29 +1,18 @@
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
-        const coin_recent_history = params.get('last_data');
+        const coin_recent_history = JSON.parse(params.get('last_data'));
+        // console.log(coin_recent_history); // [[1734123060388,"3921.60"],[1734123062128,"3921.59"]]
         const socket = new WebSocket('wss://ws.coincap.io/prices?assets='+coin_name);
         const data = [];
+        for (let i in coin_recent_history) {
+            // coin_recent_history[i][0] ==  timestamp (e.g. 1734123653695)
+            // coin_recent_history[i][1] ==  price_at_timestamp (e.g. 3917.13)
+            data.push({x: coin_recent_history[i][0], y: parseFloat(coin_recent_history[i][1])});
+        }
         const max_graph_len = 150;
 
-        // TO-DO: gather the last 10 minutes' data of this coin, to init the graph with (and continue plotting from there)
-
-        var HttpClient = function() {
-            this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
-                var anHttpRequest = new XMLHttpRequest();
-                anHttpRequest.onreadystatechange = function() {
-                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                        aCallback(anHttpRequest.responseText);
-                };
-                anHttpRequest.open(requestType, aUrl, true);
-                anHttpRequest.setRequestHeader("Content-Type", "application/json"); // Set content type to JSON
-                anHttpRequest.send(JSON.stringify(data)); // Send data as JSON
-            };
-        };
-        
-        var client = new HttpClient();
-
         if (coin_name !== "") {
-            document.getElementById('coin_title_and_price').innerHTML = `<div id="${coin_name}" class="price" style="font-size: 34px;">${coin_name.charAt(0).toUpperCase()}${coin_name.substring(1)} = <span id="${coin_name}-price">Loading...</span></div>`;
+            document.getElementById('coin_title_and_price').innerHTML = `<div id="${coin_name}" class="price" style="font-size: 34px;">${coin_name.charAt(0).toUpperCase()}${coin_name.substring(1)} = <span id="${coin_name}_price">Loading...</span></div>`;
         }
         else {
             document.getElementById('coin_title_and_price').innerText = "An Error has occured, please go back and try again!";
@@ -53,7 +42,6 @@
         }
     
         document.addEventListener("DOMContentLoaded", function () {
-            // Setup Chart.js
             let ctx = document.getElementById('barChart').getContext('2d');
             const config = {
                 type: 'line',
@@ -105,7 +93,7 @@
                 if (coin_name in prices) {
                     const price = parseFloat(prices[coin_name]).toFixed(2);
                     
-                    const elem = document.getElementById(coin_name + '-price');
+                    const elem = document.getElementById(coin_name + '_price');
 
                     elem.textContent = `${Number(price).toLocaleString("en-US")} $ (USD)`;
 

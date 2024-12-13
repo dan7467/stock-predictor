@@ -152,6 +152,11 @@
 
 
 <script>
+    
+    // TO-DO: fix auto-get coin price issue (on Create Subscription)
+
+    // TO-DO: fix issue when existing subscription's coin range is reached - auto refresh
+
     document.getElementById("stock_sym").addEventListener("focusout", getStockCurrentPrice);
 
     var HttpClient = function() {
@@ -166,12 +171,12 @@
             anHttpRequest.send(JSON.stringify(data)); // Send data as JSON
         };
     };
+    
+    var client = new HttpClient();
 
     function formatNumToFixed(num, decimals){
         return (Math.round(num * 100) / 100).toFixed(decimals);
     }
-    
-    var client = new HttpClient();
     
     function getStockCurrentPrice() {
         let sym = document.getElementById('stock_sym').value;
