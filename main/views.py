@@ -58,7 +58,7 @@ def get_current_stock_price(request):
 def get_company_info(request):
     body = json.loads(request.body)
     ticker = body.get('stock_symbol')
-    if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker):
+    if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker) and stock_data_handler.check_if_symbol_exists(ticker):
         return JsonResponse({"status": "success", "data": stock_data_handler.fetch_company_info(ticker)})
     return JsonResponse({"status": "error", "message": "No Symbol was entered."}, status=400)
 
