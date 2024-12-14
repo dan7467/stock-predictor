@@ -149,11 +149,9 @@ def updates(request):
         elif request.POST.get('_method') == 'DELETE_NOTIFICATION':
             if request.POST.get('del_notification_id', False):
                 try:
-                    # TO-DO (easy): fix it such that after this deletion, the page will refresh (like in My Profile):
                     profile.user_notifications.pop(int(request.POST.get('del_notification_id')) - 1)
                     profile.save()
-                    messages.success(request, f"Notification removed")
-                    return render(request, 'updates.html', {'my_stocks': profile.my_stocks, 'my_updates': profile.user_updates})
+                    return redirect('updates')
                 except Exception as e:
                     return JsonResponse({f"status": "error", "message": "Error occurred while deleting notification"})
             return JsonResponse({"status": "error", "message": "Error: notification doesn't exist"})

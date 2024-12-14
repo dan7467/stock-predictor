@@ -619,7 +619,6 @@ function formatNumToFixed(num, decimals){
         let date_start = document.getElementById('date_start');
         let date_end = document.getElementById('date_end');
         let all_data = false;
-        // TO-DO: fix "Today"-button's bug.
         if (days_ago != '1826') {
             date_start.value = subtractDaysFromToday(Number(days_ago));
         }

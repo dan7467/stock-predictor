@@ -40,9 +40,8 @@ class StockData:
         return yf.download(ticker, period="max", auto_adjust=False, interval=self.getIntervalFromNumOfYears(date_diff_in_years))
     
     def check_if_symbol_exists(self, ticker):
-        data = self.fetch_all_stock_data(ticker)  # TO-DO: change fetch_all_stock_data into something more efficient.
-                                                    # it's wasteful to query ALL of the data for each symbol-existence check.
-        return len(data) != 0 and not (data is pd.DataFrame and data.empty)
+        data = self.fetch_company_info(ticker)
+        return len(data) > 1 and not (data is dict and data.empty)  # if symbol doesn't exist, yfinance return a dict of len==1
     
     def fetch_current_day_stock_info(self, ticker):
         data = yf.download(ticker, period="1d", interval="1m")
