@@ -9,8 +9,8 @@ import pandas as pd
 import tensorflow as tf
 from datetime import datetime
 
-# configure tensorflow to use GPU
-sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
+# # configure tensorflow to use GPU
+# sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
 
 
 ###################################################################################################################################################
