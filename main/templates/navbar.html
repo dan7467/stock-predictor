@@ -22,6 +22,8 @@
 
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'updates' %}">Stock Updates</a></li>
 
+                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'live_crypto' %}">Realtime Crypto</a></li>
+
                 {% else %}
 
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'home' %}">Home</a></li>
@@ -29,8 +31,6 @@
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about' %}">About</a></li>
 
                 {% endif %}
-
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'live_crypto' %}">Realtime Crypto</a></li>
 
             </ul>
 
