@@ -15,6 +15,6 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('log_out/', views.log_out, name='log_out'),
     path('my_profile/', views.my_profile, name='my_profile'),
-    path('live_crypto/', views.live_crypto, name='live_crypto'),
-    path('coin_plotter/', views.coin_plotter, name='coin_plotter'),
+    path('crypto_live/', views.crypto_live, name='crypto_live'),
+    path('crypto_live_plotter/', views.crypto_live_plotter, name='crypto_live_plotter'),
 ]

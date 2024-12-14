@@ -14,19 +14,20 @@ from . import notifications, input_sanitizer
 
 stock_data_handler = StockData()
 
+# TO-DO: add stock and crypto 'peek' tiles to homepage
 def home(request):
     return render(request, 'home.html')
 
 def about(request):
     return render(request, 'about.html')
 
-def live_crypto(request):
+def crypto_live(request):
     last_action_timestamp_update(request)
-    return render(request, 'live_crypto.html')
+    return render(request, 'crypto_live.html')
 
-def coin_plotter(request):
+def crypto_live_plotter(request):
     last_action_timestamp_update(request)
-    return render(request, 'coin_plotter.html')
+    return render(request, 'crypto_live_plotter.html')
 
 def home_members(request):
     last_action_timestamp_update(request)

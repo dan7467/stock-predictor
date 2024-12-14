@@ -34,7 +34,7 @@
                 <td id="small_table_cell"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
                 <td><h4 id="${coin_symbol}_price" style="color: #66ff33;"></h4></td>
                 <td id="small_table_cell">
-                    <a id="${coin_symbol}_plotter_link" href="/coin_plotter?requested_coin=${coin_symbol}&last_data=[]" style="text-decoration:none;">
+                    <a id="${coin_symbol}_plotter_link" href="/crypto_live_plotter?requested_coin=${coin_symbol}&last_data=[]" style="text-decoration:none;">
                         <button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button>
                     </a>
                 </td>
@@ -48,7 +48,7 @@
             }
             document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
             document.getElementById('loading_status').textContent = '';
-            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/coin_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
+            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/crypto_live_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
         }
         // if (data.ethereum) {
         //    document.getElementById('prices_container').textContent = `$${data.ethereum}`;
