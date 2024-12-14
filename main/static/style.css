@@ -75,7 +75,7 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
     padding: 10px;
 }
 
-#table_row_header {
+#small_table_cell {
     width: 200px;
     max-width: 200px;
     vertical-align: middle;

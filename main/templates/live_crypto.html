@@ -33,9 +33,9 @@
             if (!(coin_symbol in coin_price_buffer)) {
                 document.getElementById('prices_table_body').innerHTML += `
                 <tr>
-                <td id="table_row_header"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
+                <td id="small_table_cell"><b id="${coin_symbol}">${normalizeCoinName(coin_symbol)}</b>:</td>
                 <td><h4 id="${coin_symbol}_price" style="color: #66ff33;"></h4></td>
-                <td id="table_row_header">
+                <td id="small_table_cell">
                     <a id="${coin_symbol}_plotter_link" href="/coin_plotter?requested_coin=${coin_symbol}&last_data=[]" style="text-decoration:none;">
                         <button class="btn btn-primary" id="${coin_symbol}_live_plot_btn">Live graph</button>
                     </a>

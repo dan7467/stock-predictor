@@ -14,6 +14,50 @@ from . import notifications
 
 stock_data_handler = StockData()
 
+def home(request):
+    return render(request, 'home.html')
+
+def about(request):
+    return render(request, 'about.html')
+
+def live_crypto(request):
+    last_action_timestamp_update(request)
+    return render(request, 'live_crypto.html')
+
+def coin_plotter(request):
+    last_action_timestamp_update(request)
+    return render(request, 'coin_plotter.html')
+
+def home_members(request):
+    last_action_timestamp_update(request)
+    return render(request, 'home.html')
+
+def about_members(request):
+    last_action_timestamp_update(request)
+    return render(request, 'about.html')
+
+@login_required
+def log_out(request):
+    logout(request)
+    return redirect('home')
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+def get_current_stock_price(request):
+    res = stock_data_handler.fetch_current_day_stock_info(json.loads(request.body).get('stock_symbol'))
+    return JsonResponse({"status": "success", "data": res.to_json()})
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+def get_company_info(request):
+    body = json.loads(request.body)
+    ticker = body.get('stock_symbol')
+    if ticker:
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_company_info(ticker)})
+    return JsonResponse({"status": "error", "message": "No Symbol was entered."}, status=400)
+
 @login_required
 def last_action_timestamp_update(request):
     profile = CustomUser.objects.get(username=request.user.username)
@@ -25,27 +69,54 @@ def last_action_timestamp_update(request):
             profile.save()
     profile.last_action_datetime_utc = datetime.now(timezone.utc).strftime("%H:%M:%S, %d.%m.%y")
     profile.save()
-
-def home_members(request):
-    last_action_timestamp_update(request)
-    return render(request, 'home.html')
-
-def about_members(request):
-    last_action_timestamp_update(request)
-    return render(request, 'about.html')
-
-def home(request):
-    return render(request, 'home.html')
-
-def about(request):
-    return render(request, 'about.html')
-
-def live_crypto(request):
-    return render(request, 'live_crypto.html')
-
-def coin_plotter(request):
-    return render(request, 'coin_plotter.html')
     
+
+def log_in(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home_members')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'login.html')
+
+@login_required
+def my_profile(request):
+    last_action_timestamp_update(request)
+    if request.method == 'POST':
+        if request.POST.get('_method', False) == 'DELETE':
+            stock_symbol = request.POST.get('_stock_sym', False)
+            if stock_symbol:
+                profile = CustomUser.objects.get(username=request.user.username)
+                try:
+                    profile.my_stocks.remove(stock_symbol)
+                    profile.save()
+                    messages.success(request, f"Stock {stock_symbol} removed from 'My Stocks'")
+                    return render(request, 'my_profile.html', {'deleted': stock_symbol})
+                except Exception as e:
+                    messages.error(request, f"Could not update stock: {e}")
+    return render(request, 'my_profile.html')
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+def get_stock_data(request):
+    body = json.loads(request.body)
+    ticker = body.get('stock_symbol')
+    start_date = body.get('from_date')
+    end_date = body.get('to_date')
+    if start_date == 'ALL' and ticker:
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_all_stock_data(ticker).to_json()})
+    if start_date == end_date == datetime.now().strftime('%Y-%m-%d'):
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_current_day_stock_info(ticker).to_json()})
+    dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
+    if ticker and start_date and end_date and dates_valid:
+        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_data(ticker, start_date, end_date).to_json()})
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
 @login_required
 def updates(request):
     last_action_timestamp_update(request)
@@ -75,44 +146,21 @@ def updates(request):
                 except Exception as e:
                     return JsonResponse({f"status": "error", "message": "Error occurred while deleting subscription"})
             return JsonResponse({"status": "error", "message": "Error: Stock subscription doesn't exist"})
+        elif request.POST.get('_method') == 'DELETE_NOTIFICATION':
+            if request.POST.get('del_notification_id', False):
+                try:
+                    # TO-DO (easy): fix it such that after this deletion, the page will refresh (like in My Profile):
+                    profile.user_notifications.pop(int(request.POST.get('del_notification_id')) - 1)
+                    profile.save()
+                    messages.success(request, f"Notification removed")
+                    return render(request, 'updates.html', {'my_stocks': profile.my_stocks, 'my_updates': profile.user_updates})
+                except Exception as e:
+                    return JsonResponse({f"status": "error", "message": "Error occurred while deleting notification"})
+            return JsonResponse({"status": "error", "message": "Error: notification doesn't exist"})
         return JsonResponse({"status": "error", "message": "Error: Wrong method (should be PATCH or DELETE)"})
     if len(profile.user_updates) == 0:
         return render(request, 'updates.html', {'my_stocks': profile.my_stocks})
     return render(request, 'updates.html', {'my_stocks': profile.my_stocks, 'my_updates': profile.user_updates})
-
-@login_required
-@csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
-def get_current_stock_price(request):
-    res = stock_data_handler.fetch_current_day_stock_info(json.loads(request.body).get('stock_symbol'))
-    return JsonResponse({"status": "success", "data": res.to_json()})
-
-@login_required
-@csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
-def get_stock_data(request):
-    body = json.loads(request.body)
-    ticker = body.get('stock_symbol')
-    start_date = body.get('from_date')
-    end_date = body.get('to_date')
-    if start_date == 'ALL' and ticker:
-        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_all_stock_data(ticker).to_json()})
-    if start_date == end_date == datetime.now().strftime('%Y-%m-%d'):
-        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_current_day_stock_info(ticker).to_json()})
-    dates_valid = datetime.strptime(start_date, '%Y-%m-%d') <= datetime.strptime(end_date, '%Y-%m-%d')
-    if ticker and start_date and end_date and dates_valid:
-        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_data(ticker, start_date, end_date).to_json()})
-    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
-
-@login_required
-@csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
-def get_company_info(request):
-    body = json.loads(request.body)
-    ticker = body.get('stock_symbol')
-    if ticker:
-        return JsonResponse({"status": "success", "data": stock_data_handler.fetch_company_info(ticker)})
-    return JsonResponse({"status": "error", "message": "No Symbol was entered."}, status=400)
 
 @login_required
 @csrf_exempt
@@ -135,22 +183,6 @@ def stocks(request):
             return render(request, 'stocks.html', {'chosen_stock_name': stock_symbol, 'my_stocks': profile.my_stocks})  # Re-render the same page
     return render(request, 'stocks.html', {'my_stocks': profile.my_stocks})
 
-@login_required
-def my_profile(request):
-    last_action_timestamp_update(request)
-    if request.method == 'POST':
-        if request.POST.get('_method', False) == 'DELETE':
-            stock_symbol = request.POST.get('_stock_sym', False)
-            if stock_symbol:
-                profile = CustomUser.objects.get(username=request.user.username)
-                try:
-                    profile.my_stocks.remove(stock_symbol)
-                    profile.save()
-                    messages.success(request, f"Stock {stock_symbol} removed from 'My Stocks'")
-                    return render(request, 'my_profile.html', {'deleted': stock_symbol})
-                except Exception as e:
-                    messages.error(request, f"Could not update stock: {e}")
-    return render(request, 'my_profile.html')
 
 def register(request):
     if request.method == 'POST':
@@ -180,23 +212,3 @@ def register(request):
             
     return render(request, 'register.html')
 
-def log_in(request):
-    if request.method == 'POST':
-        
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return redirect('home_members')
-        
-        else:
-            messages.error(request, 'Invalid username or password.')
-            
-    return render(request, 'login.html')
-
-@login_required
-def log_out(request):
-    logout(request)
-    return redirect('home')

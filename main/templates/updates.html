@@ -12,25 +12,33 @@
 {% comment %} [datetime_str(format="%H:%M, %d.%m.%y"), subscribed_update, directive_dir, directive_val, '#FF204E'] {% endcomment %}
 <h3>Notifications:</h3>
     <div>
+    <form method="post">
+        {% csrf_token %}
         <table class="table table-bordered">
             {% if user.user_notifications %}
                 {% for notification in user.user_notifications %}
                         <tr>
-                            <td id="table_row_header"><b>{{notification.0}}</b></td>
+                            <td id="small_table_cell"><b>{{notification.0}}</b></td>
                     {% if notification|length > 2 %}
                             <td><b>{{notification.1}}</b> has reached <b style="color: {{ notification.4 }};">{{notification.2}}</b> to price <b>{{notification.3}}</b>!</td>
                     {% else %}
                             <td>{{notification.1}}</td>
                     {% endif %}
+                            <td id="small_table_cell">
+                                <button type="submit" class="btn btn-danger" id="del_{{ forloop.counter }}" onclick="remove_notification('{{ forloop.counter }}')">Delete</button>
+                            </td>
                         </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td id="table_row_header">None</td>
+                    <td id="small_table_cell">None</td>
                     <td>No new Notifications yet!</td>
                 </tr>
             {% endif %}
         </table>
+        <input type="hidden" name="_method" value="DELETE_NOTIFICATION">
+        <input type="hidden" id="del_notification_id" name="del_notification_id" value="">
+    </form>
     </div>
 
 <br/>
@@ -52,7 +60,7 @@
             {% if my_updates %}
                 {% for update_stock, update_specifics in my_updates.items %}
                     <tr>
-                        <td id="table_row_header">
+                        <td id="small_table_cell">
                             {{ update_specifics.0 }}
                         </td>
                         <td>
@@ -66,14 +74,14 @@
                                 {{ update_specifics.1 }}</a>
                             </b> to <b>{{ update_specifics.2 }}</b>
                         </td>
-                        <td id="table_row_header">
+                        <td id="small_table_cell">
                         <button type="submit" id="del_{{ update_stock }}_{{update_specifics.1}}_{{ update_specifics.2 }}_btn" onclick="remove_subscription('{{ update_stock }}', '{{ update_specifics.1 }}', '{{ update_specifics.2 }}')" class="btn btn-danger">Remove</button>
                         </td>
                     </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td id="table_row_header">
+                    <td id="small_table_cell">
                         None
                     </td>
                     <td>
@@ -203,11 +211,17 @@
     }
 
     function remove_subscription(stock_sym, dir, val) {
-            document.getElementById('del_stock_sym').value = stock_sym;
-            document.getElementById('del_price_direction').value = dir;
-            document.getElementById('del_bound_val').value = val;
-            document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').innerHTML = 'Loading...';
-            document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').className = 'btn btn-secondary';
+        document.getElementById('del_stock_sym').value = stock_sym;
+        document.getElementById('del_price_direction').value = dir;
+        document.getElementById('del_bound_val').value = val;
+        document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').innerHTML = 'Loading...';
+        document.getElementById('del_'+stock_sym+'_'+dir+'_'+val+'_'+'_btn').className = 'btn btn-secondary';
+    }
+
+    function remove_notification(notification_index) {
+        console.log(notification_index);
+        document.getElementById('del_notification_id').value = notification_index;
+        document.getElementById('del_'+notification_index).innerHTML = 'Loading...';
     }
 
     function reveal_subscription_form() {
