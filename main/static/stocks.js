@@ -1,7 +1,7 @@
 let lastStockSymbolForCompanyInfo = '';
 
 function update_name() {
-    document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
+    document.getElementById('_symbol').value = document.getElementById('stock_sym').value.toUpperCase();
 }
 
 document.getElementById('postpre_market_data_bool').addEventListener('change', getStockData);
@@ -22,7 +22,7 @@ var HttpClient = function() {
 var client = new HttpClient();
 
 function getStockData() {
-    let sym = document.getElementById('stock_sym').value;
+    let sym = document.getElementById('stock_sym').value.toUpperCase();
     let postpre_bool = document.getElementById('postpre_market_data_bool').checked;
     if (sym !== '') {
         const data = {
@@ -443,7 +443,7 @@ function formatNumToFixed(num, decimals){
 
     var update = function() {
 
-        curr_stock_sym = document.getElementById('stock_sym').value;
+        curr_stock_sym = document.getElementById('stock_sym').value.toUpperCase();
 
         document.getElementById('stock_sym_title').innerHTML = `<b>${curr_stock_sym}</b>`;
 
@@ -629,7 +629,7 @@ function formatNumToFixed(num, decimals){
         return new Date().subtractDays(daysToSubtract).toISOString().split('T')[0];
     }
     function autoDate(days_ago) {
-        let sym = document.getElementById('stock_sym').value;
+        let sym = document.getElementById('stock_sym').value.toUpperCase();
         let date_start = document.getElementById('date_start');
         let date_end = document.getElementById('date_end');
         let all_data = false;
