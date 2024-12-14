@@ -52,4 +52,4 @@ def add_user_stock_notification(request, profile, update):  # update == ["%H:%M:
     else:
         profile.user_notifications.append([datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3], '#FF204E'])
     profile.save()
-    print(f'added notification: {[datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3]]}')
+    # print(f'added notification: {[datetime.strptime(update[0], "%H:%M:%S, %d.%m.%y").strftime("%H:%M, %d.%m.%y"), update[1], update[2], update[3]]}')

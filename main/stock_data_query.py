@@ -21,23 +21,24 @@ class StockData:
     def fetch_company_info(self, ticker):
         return yf.Ticker(ticker).info
             
-    def fetch_data(self, ticker, start_date, end_date):
+    def fetch_data(self, ticker, start_date, end_date, postpre):
         total_days = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days
         if total_days < 1:
             return self.fetch_current_day_stock_info(ticker)
         if 1 <= total_days < 32:
-            return yf.download(ticker, start=start_date, end=end_date, interval="1h")
+            return yf.download(ticker, start=start_date, end=end_date, interval="1h", prepost=postpre)
         if total_days > self.resolution:
-            return yf.download(ticker, start=start_date, end=end_date, interval=self.calc_resolution(total_days))
-        return yf.download(ticker, start=start_date, end=end_date)   
+            return yf.download(ticker, start=start_date, end=end_date, interval=self.calc_resolution(total_days), prepost=True)
+        return yf.download(ticker, start=start_date, end=end_date, prepost=True)   
 
     def min_interval_fetch_data(self, ticker, start_date, end_date=datetime.now(timezone.utc).date()):
-        return yf.download(ticker, start=start_date, end=end_date, interval="1m")
+        return yf.download(ticker, start=start_date, end=end_date, interval="1m", prepost=True)
     
-    def fetch_all_stock_data(self, ticker):
+    # TO-DO: receive 'prepost' parameter from UI (selection-type input)
+    def fetch_all_stock_data(self, ticker, postpre):
         first_trade_epoch_utc_date = int(self.fetch_company_info(ticker)['firstTradeDateEpochUtc'])
         date_diff_in_years = (datetime.now() - datetime.fromtimestamp(first_trade_epoch_utc_date)).days / 365.25
-        return yf.download(ticker, period="max", auto_adjust=False, interval=self.getIntervalFromNumOfYears(date_diff_in_years))
+        return yf.download(ticker, period="max", auto_adjust=False, interval=self.getIntervalFromNumOfYears(date_diff_in_years), prepost=postpre)
     
     def check_if_symbol_exists(self, ticker):
         try:
@@ -46,8 +47,8 @@ class StockData:
         except Exception as e:
             return False
     
-    def fetch_current_day_stock_info(self, ticker):
-        data = yf.download(ticker, period="1d", interval="1m")
+    def fetch_current_day_stock_info(self, ticker, postpre):
+        data = yf.download(ticker, period="1d", interval="1m", prepost=postpre)
         val_dict_len = len(data['Close'])
         if val_dict_len <= self.resolution:
             return data

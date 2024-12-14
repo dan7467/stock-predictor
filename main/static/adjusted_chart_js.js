@@ -4,6 +4,8 @@ function update_name() {
     document.getElementById('_symbol').value = document.getElementById('stock_sym').value;
 }
 
+document.getElementById('postpre_market_data_bool').addEventListener('change', getStockData);
+
 var HttpClient = function() {
     this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
         var anHttpRequest = new XMLHttpRequest();
@@ -21,11 +23,13 @@ var client = new HttpClient();
 
 function getStockData() {
     let sym = document.getElementById('stock_sym').value;
+    let postpre_bool = document.getElementById('postpre_market_data_bool').checked;
     if (sym !== '') {
         const data = {
             stock_symbol: sym,
             from_date: document.getElementById('date_start').value,
-            to_date: document.getElementById('date_end').value
+            to_date: document.getElementById('date_end').value,
+            postpre: postpre_bool
         };
         client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
             refreshStockData(response, sym);
@@ -497,7 +501,7 @@ function formatNumToFixed(num, decimals){
             !(`('Open', '${stock_symbol}')` in parsed_data) || 
             (`('Open', '${stock_symbol}')` in parsed_data && parsed_data[`('Open', '${stock_symbol}')`].length === 0)
         ) {
-            console.log('Error: stock data unavailable');
+            alert('Error: stock data unavailable');
         }
         else {
             // process data
@@ -586,7 +590,7 @@ function formatNumToFixed(num, decimals){
                 });
             }
             else {
-                console.log("Can't retrieve company info: stock symbol is not valid.");
+                alert("Can't retrieve company info: stock symbol is not valid.");
             }
         }
     }
