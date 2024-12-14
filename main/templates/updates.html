@@ -100,7 +100,12 @@
 </div>
 <button id="add_subscription_btn" onclick="reveal_subscription_form()" class="btn btn-light"><b>+</b></button>
 <br/>
+{% if error_msg %}
+<script>alert("Error: {{ error_msg }}");</script>
+<div id="subscribe_form_container">
+{% else %}
 <div id="subscribe_form_container" style="visibility: hidden;">
+{% endif%}
 <h3>Subscribe for stock updates:</h3>
 <form method="post">
     {% csrf_token %}
@@ -109,7 +114,7 @@
             <tr>
                 <td><label for="stock_sym" class="form-label">Stock Symbol: </label></td>
                 <td><label for="date" class="form-label">Directive: </label></td>
-                <td><label for="date" class="form-label">Value: </label></td>
+                <td><label for="date" class="form-label">Value Bound: </label></td>
                 <td></td>
             </tr>
         </thead>
@@ -168,6 +173,8 @@
     // TO-DO: fix issue when existing subscription's coin range is reached - auto refresh
 
     // TO-DO: force the Notifications Table show only the last 6 Notifications, for the UI to be comfortable
+                    // it probably requires migrating models.py to use a dict instead of a list,
+                    // since currently the viewing and deletion of notifications is according to their list index
 
     document.getElementById("stock_sym").addEventListener("focusout", getStockCurrentPrice);
 

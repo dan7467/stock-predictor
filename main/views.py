@@ -14,6 +14,8 @@ from . import notifications
 
 stock_data_handler = StockData()
 
+# TO-DO: implement an input sanitizer mechanism to prevent sql injections
+
 def home(request):
     return render(request, 'home.html')
 
@@ -43,14 +45,14 @@ def log_out(request):
 
 @login_required
 @csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+@require_http_methods(["POST"])
 def get_current_stock_price(request):
     res = stock_data_handler.fetch_current_day_stock_info(json.loads(request.body).get('stock_symbol'))
     return JsonResponse({"status": "success", "data": res.to_json()})
 
 @login_required
 @csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+@require_http_methods(["POST"])
 def get_company_info(request):
     body = json.loads(request.body)
     ticker = body.get('stock_symbol')
@@ -102,7 +104,7 @@ def my_profile(request):
 
 @login_required
 @csrf_exempt
-@require_http_methods(["POST"])  # TO-DO: change to a get request.. this should not be a POST
+@require_http_methods(["POST"])
 def get_stock_data(request):
     body = json.loads(request.body)
     ticker = body.get('stock_symbol')
@@ -135,7 +137,7 @@ def updates(request):
                     return render(request, 'updates.html', {'my_stocks': profile.my_stocks, 'my_updates': profile.user_updates})
                 except Exception as e:
                     return JsonResponse({f"status": "error", "message": "Error occurred while creating subscription"})
-            return JsonResponse({"status": "error", "message": "Error: Stock already subscripted to, or doesn't exist"})
+            return render(request, 'updates.html', {'my_stocks': profile.my_stocks, 'my_updates': profile.user_updates, 'error_msg': f'Error: Symbol {stock_symbol} does not exist.'})
         # delete existing subscription:
         elif request.POST.get('_method') == 'DELETE':
             if stock_symbol and directive and directive_value and stock_symbol in profile.user_updates:
@@ -146,6 +148,7 @@ def updates(request):
                 except Exception as e:
                     return JsonResponse({f"status": "error", "message": "Error occurred while deleting subscription"})
             return JsonResponse({"status": "error", "message": "Error: Stock subscription doesn't exist"})
+        # delete existing notification:
         elif request.POST.get('_method') == 'DELETE_NOTIFICATION':
             if request.POST.get('del_notification_id', False):
                 try:
