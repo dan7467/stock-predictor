@@ -9,8 +9,8 @@ import pandas as pd
 import tensorflow as tf
 from datetime import datetime
 
-# configure tensorflow to use GPU
-sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
+# # configure tensorflow to use GPU
+# sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
 
 
 ###################################################################################################################################################
@@ -70,8 +70,8 @@ x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 # Build LSTM model
 model = Sequential()
-model.add(LSTM(100, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-model.add(LSTM(50, return_sequences=False))
+model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(64, return_sequences=False))
 model.add(Dense(25))
 model.add(Dense(1))
 
