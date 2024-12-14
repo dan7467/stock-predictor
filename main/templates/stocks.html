@@ -48,7 +48,7 @@
         <tr><td></td></tr>
         <tr>
             <td>
-                <div class="mb-3" id="table_cell_centered">
+                <div id="table_cell_centered">
                     {% if chosen_stock_name %}
                         <input type="text" placeholder="Symbol (e.g. 'MSFT')" class="form-control" id="stock_sym" name="stock_sym" value="{{ chosen_stock_name }}" list="my_stocks_list" required>
                     {% else %}
@@ -65,13 +65,13 @@
             </td>
             <td><label for="date" class="form-label">From: </label></td>
             <td>
-                <div class="mb-3" id="table_cell_centered">
+                <div id="table_cell_centered">
                     <input type="date" id="date_start" name="date_start" value="2024-11-10" />
                 </div>
             </td>
             <td><label for="date" class="form-label">To: </label></td>
             <td>
-                <div class="mb-3" id="table_cell_centered">
+                <div id="table_cell_centered">
                     <input type="date" id="date_end" name="date_end" value="2024-12-06" />
                 </div>
             </td>

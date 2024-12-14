@@ -1,5 +1,6 @@
 :root {
     --bg: #03346E;
+    --bg_bright: #044595;
     --navbar: #021526; 
     --text: #E2E2B6;
 }
@@ -22,7 +23,6 @@ html {
 
 #main_site_buttons {
     color: var(--text);
-    background-color: #97977a;
     border-radius: 10px;
     margin-left: 10px;
     background: radial-gradient(
@@ -32,8 +32,12 @@ html {
 }
 
 #main_site_buttons:hover {
-    transform:scale(1.15);
-    transition: 0.2s;
+    transform:scale(1.08);
+    transition: 0.4s;
+    background: radial-gradient(
+        var(--bg_bright) 30%, 
+        var(--navbar) 70%
+    );
 }
 
 #body {
