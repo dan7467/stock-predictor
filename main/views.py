@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .stock_data_query import StockData
 from datetime import datetime, timezone
-from .models import CustomUser
+from .models import CustomUser, CryptoCoinNames
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -41,6 +41,20 @@ def about_members(request):
 def log_out(request):
     logout(request)
     return redirect('home')
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_crypto_coin_list(request):
+    body = json.loads(request.body)
+    page_num = body.get('page_number')
+    coins_per_page = 13
+    offset = page_num * coins_per_page
+    crypto_coins = CryptoCoinNames.objects.order_by('id')[offset:offset + coins_per_page]
+    try:
+        return JsonResponse({"status": "success", "data": list(crypto_coins.values_list('coin_name', flat=True))})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": f"FetchCryptoCoinListErr: {e}"})
 
 @login_required
 @csrf_exempt

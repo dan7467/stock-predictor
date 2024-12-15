@@ -6,6 +6,8 @@ function update_name() {
 
 document.getElementById('postpre_market_data_bool').addEventListener('change', getStockData);
 
+document.getElementById('date_end').value = getTodaysDateStr();
+
 var HttpClient = function() {
     this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
         var anHttpRequest = new XMLHttpRequest();
@@ -31,7 +33,7 @@ function getStockData() {
             to_date: document.getElementById('date_end').value,
             postpre: postpre_bool
         };
-        client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
+        client.sendHttpRequest('POST', '/get_stock_data', data, function(response) {
             refreshStockData(response, sym);
             refreshCompanyInfo(sym);
             document.getElementById('chart_container').style.visibility = 'visible';
@@ -569,9 +571,7 @@ function formatNumToFixed(num, decimals){
             lastStockSymbolForCompanyInfo = stock_sym;
             if (stock_sym !== ''){
                 try {
-                    client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_company_info', {stock_symbol: stock_sym}, function(response) {
-                        console.log(`${JSON.parse(response)['status']} == 'success': ${JSON.parse(response)['status'] == 'success'}`);
-                        console.log(`${JSON.parse(response)['status']} == 'error': ${JSON.parse(response)['status'] == 'error'}`);
+                    client.sendHttpRequest('POST', '/get_company_info', {stock_symbol: stock_sym}, function(response) {
                         let res_parsed = JSON.parse(response)['data'];
                         let keys = Object.keys(res_parsed);
                         let stock_currency = res_parsed['financialCurrency'];
@@ -649,7 +649,7 @@ function formatNumToFixed(num, decimals){
                 from_date: all_data ? 'ALL' : date_start.value,
                 to_date: date_end.value
             };
-            client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_stock_data', data, function(response) {
+            client.sendHttpRequest('POST', '/get_stock_data', data, function(response) {
                 refreshStockData(response, sym);
                 refreshCompanyInfo(sym);
                 document.getElementById('chart_container').style.visibility = 'visible';

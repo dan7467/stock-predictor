@@ -35,7 +35,7 @@ function getStockCurrentPrice() {
         const data = {
             stock_symbol: sym
         };
-        client.sendHttpRequest('POST', 'http://127.0.0.1:8000/get_current_stock_price', data, function (response) {
+        client.sendHttpRequest('POST', '/get_current_stock_price', data, function (response) {
             let res = JSON.parse(response);
             let parsed_data = JSON.parse(res['data']);
             let keys_as_nums = Object.keys(parsed_data['Close']).map((x) => Number(x));
