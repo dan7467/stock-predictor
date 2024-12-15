@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
 </head>
 <body>
-    <h1 id="stock_sym_title"></h1>
+    <h1 id="stock_sym_title"></h1><span class="loader" id="graph_loader" style="visibility: hidden;"></span>
     <div id="chart_container" style="min-width:100%; width:100%; max-width:100%; visibility: hidden;">
         <canvas id="chart"></canvas>
         <label for="postpre_market_data_bool"><input id="postpre_market_data_bool" type="checkbox">Include Post-Market & Pre-Market</label>

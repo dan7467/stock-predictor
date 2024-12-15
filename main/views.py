@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from .models import CustomUser, CryptoCoinNames
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, requests
 from . import notifications, input_sanitizer
 
 stock_data_handler = StockData()
@@ -44,15 +44,20 @@ def log_out(request):
 
 @login_required
 @csrf_exempt
-@require_http_methods(["POST"])
+@require_http_methods(["POST"])  # <<-- TO-DO: replace these http requests' POST with GET
 def get_crypto_coin_list(request):
     body = json.loads(request.body)
     page_num = body.get('page_number')
     coins_per_page = 13
     offset = page_num * coins_per_page
-    crypto_coins = CryptoCoinNames.objects.order_by('id')[offset:offset + coins_per_page]
+    crypto_coins = list(CryptoCoinNames.objects.order_by('id')[offset:offset + coins_per_page].values_list('coin_name', flat=True))
+    # This below, is currently canceled since the amount of http requests caused the host to think it's a DoS attack...
+    # It is too bad they don't have an endpoint for multiple coins, from what I have seen, so it's 1 request, instead of 13
+    # coins_last_prices = []
+    # for coin_id in crypto_coins:
+    #     coins_last_prices.append(requests.get(f'https://api.coincap.io/v2/assets/{coin_id}').json()['data']['priceUsd'])
     try:
-        return JsonResponse({"status": "success", "data": list(crypto_coins.values_list('coin_name', flat=True))})
+        return JsonResponse({"status": "success", "coin_list": crypto_coins})
     except Exception as e:
         return JsonResponse({"status": "error", "message": f"FetchCryptoCoinListErr: {e}"})
 

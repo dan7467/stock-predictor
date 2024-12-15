@@ -24,6 +24,7 @@ var HttpClient = function() {
 var client = new HttpClient();
 
 function getStockData() {
+    document.getElementById('graph_loader').style.visibility = 'visible';
     let sym = document.getElementById('stock_sym').value.toUpperCase();
     let postpre_bool = document.getElementById('postpre_market_data_bool').checked;
     if (sym !== '') {
@@ -37,9 +38,11 @@ function getStockData() {
             refreshStockData(response, sym);
             refreshCompanyInfo(sym);
             document.getElementById('chart_container').style.visibility = 'visible';
+            document.getElementById('graph_loader').style.visibility = 'hidden';
         });
     } else {
         alert('Error: No stock symbol input');
+        document.getElementById('graph_loader').style.visibility = 'hidden';
     }
 }
 function formatNumToFixed(num, decimals){
@@ -629,6 +632,7 @@ function formatNumToFixed(num, decimals){
         return new Date().subtractDays(daysToSubtract).toISOString().split('T')[0];
     }
     function autoDate(days_ago) {
+        document.getElementById('graph_loader').style.visibility = 'visible';
         let sym = document.getElementById('stock_sym').value.toUpperCase();
         let date_start = document.getElementById('date_start');
         let date_end = document.getElementById('date_end');
@@ -653,8 +657,10 @@ function formatNumToFixed(num, decimals){
                 refreshStockData(response, sym);
                 refreshCompanyInfo(sym);
                 document.getElementById('chart_container').style.visibility = 'visible';
+                document.getElementById('graph_loader').style.visibility = 'hidden';
             });
         } else {
+            document.getElementById('graph_loader').style.visibility = 'hidden';
             alert('Error: No stock symbol input');
         }
     }
