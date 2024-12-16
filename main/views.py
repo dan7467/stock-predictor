@@ -21,7 +21,20 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
+@login_required
+@require_http_methods(["POST", "GET"])
 def crypto_live(request):
+    if request.method == 'POST':  # search stock name or symbol
+        search_input = request.POST.get('search_input_field', False).strip()
+        matched_coins = (
+            CryptoCoinNames.objects
+            .filter(coin_name__iregex=rf"^{search_input}")  # Matches at the start of the string
+            .order_by('coin_name')  # Limit to 10 results for efficiency
+        )
+        result = list(matched_coins.values_list('coin_name', flat=True))
+        if len(result) == 0 or not search_input:
+            return render(request, 'crypto_live.html', {"search_results": '0'})
+        return render(request, 'crypto_live.html', {"search_results": ','.join(result)})
     last_action_timestamp_update(request)
     return render(request, 'crypto_live.html')
 

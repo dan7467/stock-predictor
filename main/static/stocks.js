@@ -425,10 +425,10 @@ function formatNumToFixed(num, decimals){
     }
 
     function randomBar(target, index, date, lastClose) {
-        var open = +randomNumber(lastClose * 0.95, lastClose * 1.05).toFixed(2);
-        var close = +randomNumber(open * 0.95, open * 1.05).toFixed(2);
-        var high = +randomNumber(Math.max(open, close), Math.max(open, close) * 1.1).toFixed(2);
-        var low = +randomNumber(Math.min(open, close) * 0.9, Math.min(open, close)).toFixed(2);
+        var open = +randomNumber(lastClose * 0.95, lastClose * 1.05).toFixed(3);
+        var close = +randomNumber(open * 0.95, open * 1.05).toFixed(3);
+        var high = +randomNumber(Math.max(open, close), Math.max(open, close) * 1.1).toFixed(3);
+        var low = +randomNumber(Math.min(open, close) * 0.9, Math.min(open, close)).toFixed(3);
         var vol = 0;
 
         if (!target[index]) {

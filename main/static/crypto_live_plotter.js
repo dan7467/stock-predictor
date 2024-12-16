@@ -91,7 +91,7 @@
             socket.onmessage =  function (event) {
                 const prices = JSON.parse(event.data);
                 if (coin_name in prices) {
-                    const price = parseFloat(prices[coin_name]).toFixed(2);
+                    const price = parseFloat(prices[coin_name]).toFixed(3);
                     
                     const elem = document.getElementById(coin_name + '_price');
 
@@ -99,7 +99,7 @@
 
                     data.push({ x: new Date().timeNow(), y: parseFloat(price) });
 
-                    const lastPrice = parseFloat(getCookie(coin_name)).toFixed(2);
+                    const lastPrice = parseFloat(getCookie(coin_name)).toFixed(3);
 
                     if (lastPrice !== "") {
                         config.data.datasets[0].borderColor = price > lastPrice ? '#66ff33' : '#ff1a1a';

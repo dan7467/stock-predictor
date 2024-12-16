@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<h1><u>Real-time Crypto Prices</u></h1>
-<br/>
+<table>
+    <tr>
+        <form method="post">
+        {% csrf_token %}
+            <td>
+                <input type="text" id="search_input_field" name="search_input_field" style="max-height:36px">
+            </td>
+            <td>
+                <button type="submit" class="btn btn-primary" style="max-height:36px">Search</button>
+            </td>
+            <td><a id="search_results_status" style="visibility: hidden;"></a></td>
+        </form>
+    </tr>
+<table>
 
 <div id="prices_container">
     <table class="table table-bordered">
@@ -15,18 +26,12 @@
 
 <a id="prev_page_btn_wrapper"><button class="btn btn-secondary" id="next_page_btn">Previous Page</button></a>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-Page <b><a id="curr_page"></a></b>
+Page <b><a id="curr_page"></a> (<a id="curr_num_of_pages"></a> Total)</b>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 <a id="next_page_btn_wrapper"><button class="btn btn-secondary" id="prev_page_btn">Next Page</button></a>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script language="javascript">
-    
-    // TO-DO 1.0: busyLoader to this page
-    // TO-DO 1.1: replace the presented price decimal fix with a default of 3
-    // TO-DO 1.2: make a select input to choose the decimal fix value (0-5)
-    // TO-DO 1.3: add a search box
-    // TO-DO 1.4: add icons to coins
 
     var HttpClient = function() {
         this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
@@ -40,11 +45,11 @@ Page <b><a id="curr_page"></a></b>
             anHttpRequest.send(JSON.stringify(data)); 
         };
     };
-    
     var client = new HttpClient();
 
     var params = new URLSearchParams(window.location.search);
     let page_num = Number(params.get('page_num'));
+    let num_of_pages = 48;  // TO-DO: make this variable depend on Math.ceil(the actual number of results / page_size)
     document.getElementById('curr_page').textContent = page_num + 1;
     let page_coin_ids_str = '';
     
@@ -54,15 +59,33 @@ Page <b><a id="curr_page"></a></b>
     if (page_num === 0) {
         document.getElementById('prev_page_btn_wrapper').style.visibility = 'hidden';
     }
-    else if (page_num === 48) {
-        document.getElementById('next_page_btn_wrapper').style.visibility = 'hidden';
-    }
+
+    // TO-DO: solve issue where there's more than 13 results (e.g. search 'b') and they are all on the same page (complex)
+
+    // TO-DO: solve issue when the search is being performed from page > 1, reset curr page to 0 BEFORE the search (pretty easy)
 
     client.sendHttpRequest('POST', '/get_crypto_coin_list', {page_number: page_num}, function(response) {
         let res = JSON.parse(response);
         page_coin_ids_list = res['coin_list'];
-        // coin_last_price_list = res['coin_last_price_list'];
         page_coin_ids_str = page_coin_ids_list.join();
+        {% if search_results %}
+            {% if search_results|length > 1 %}
+                page_coin_ids_str = '{{ search_results }}';
+                page_coin_ids_list = page_coin_ids_str.split(',');
+                num_of_pages = Math.ceil(page_coin_ids_list.length / 13);
+                document.getElementById('search_results_status').innerHTML = `&emsp;&emsp;&emsp;&emsp;Found <b>${page_coin_ids_list.length}</b> results:`;
+            {% else %}
+                document.getElementById('search_results_status').innerHTML = `&emsp;&emsp;&emsp;&emsp; <a style="color: #ff1a1a;">No results found, please check your query.</a>`;
+            {% endif%}
+            document.getElementById('search_results_status').style.visibility = 'visible';
+        {% endif %}
+
+        if (page_num === num_of_pages - 1) {
+            document.getElementById('next_page_btn_wrapper').style.visibility = 'hidden';
+        }
+
+        document.getElementById('curr_num_of_pages').innerHTML = num_of_pages;
+
         const ws = new WebSocket('wss://ws.coincap.io/prices?assets='+page_coin_ids_str);
         let coin_price_buffer = {};
 
@@ -71,7 +94,7 @@ Page <b><a id="curr_page"></a></b>
             document.getElementById('prices_table_body').innerHTML += `
                     <tr>
                     <td id="small_table_cell"><b id="${page_coin_ids_list[i]}">${normalizeCoinName(page_coin_ids_list[i])}</b>:</td>
-                    <td><h4 id="${page_coin_ids_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h4></td>
+                    <td><h5 id="${page_coin_ids_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h5></td>
                     <td id="small_table_cell">
                         <a id="${page_coin_ids_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${page_coin_ids_list[i]}&last_data=[]" style="text-decoration:none;">
                             <button class="btn btn-primary" id="${page_coin_ids_list[i]}_live_plot_btn">Live graph</button>
