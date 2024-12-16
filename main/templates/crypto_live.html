@@ -8,7 +8,9 @@
     <title>{% block title %}i-Stocks | Crypto Live{% endblock %}</title>
 </head>
 
-<table>
+<br/>
+
+<table style="margin-bottom: 24px; left: 50%;">
     <tr>
         <form method="post">
         {% csrf_token %}
@@ -33,7 +35,7 @@
 
 <a id="prev_page_btn_wrapper"><button class="btn btn-secondary" id="next_page_btn">Previous Page</button></a>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-Page <b><a id="curr_page"></a> (<a id="curr_num_of_pages"></a> Total)</b>
+Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 <a id="next_page_btn_wrapper"><button class="btn btn-secondary" id="prev_page_btn">Next Page</button></a>
 

@@ -14,10 +14,6 @@
 
                 {% if user.is_authenticated %}
 
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'home_members' %}">Home</a></li>
-
-                    <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'about_members' %}">About</a></li>
-
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="{% url 'stocks' %}">Stocks</a></li>
 
                     <li class="nav-item"><a id="main_site_buttons" class="nav-link" href="/crypto_live?page_num=0">Crypto<sub style="font-size: 9px; color: orange;">LIVE!</sub></a></li>

@@ -1,6 +1,6 @@
 :root {
     --bg: #365486;
-    --bg_bright: #7fc7d950;
+    --bg_bright: #4d78a0;
     --navbar: #0F1035; 
     --text: #DCF2F1;
 }
@@ -28,8 +28,8 @@ html {
 }
 
 #main_site_buttons:hover {
-    transform:scale(1.08);
-    transition: 0.4s;
+    color: #97977a;
+    transition: 0.3s;
 }
 
 #body {
@@ -42,9 +42,15 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
     color: var(--text);
 }
 
+nav {
+    margin-top: 28px;
+    position: fixed;
+}
+
 #navbar {
     background-color: var(--navbar);
     font-size: 20px;
+    position: fixed;
 }
 
 #main_container {
@@ -63,18 +69,26 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
 
 #logo:hover {
     color: #97977a;
-    transition: 0.4s;
+    transition: 0.3s;
 }
 
 footer {
     background-color: var(--bg_bright);
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 14px;
     position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
     text-align: center;
+}
+
+.footer_links {
+    color: white;
+    text-decoration: none;
+}
+
+.footer_links:hover {
+    text-decoration: underline;
 }
 
 #table_cell_centered {

@@ -397,7 +397,7 @@ function formatNumToFixed(num, decimals){
     var barData = new Array(barCount);
     var lineData = new Array(barCount);
 
-    var curr_stock_sym = '(No stock chosen)';
+    var curr_stock_sym = '';
 
     document.getElementById('stock_sym_title').innerHTML = `<b>${curr_stock_sym}</b>`;
 
