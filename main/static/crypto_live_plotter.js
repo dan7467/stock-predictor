@@ -1,5 +1,6 @@
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
+        document.title = `i-Stocks | ${coin_name.charAt(0).toUpperCase() + coin_name.substring(1)} Live Graph`;
         const coin_recent_history = JSON.parse(params.get('last_data'));
         // console.log(coin_recent_history); // [[1734123060388,"3921.60"],[1734123062128,"3921.59"]]
         const socket = new WebSocket('wss://ws.coincap.io/prices?assets='+coin_name);

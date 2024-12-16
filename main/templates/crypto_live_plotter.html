@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.1.2/chart.umd.js"></script>
+    <title>{% block title %}i-Stocks | Crypto Live Graph{% endblock %}</title>
 </head>
+
 <body>
 
     <div id="coin_title_and_price">Loading...</div>

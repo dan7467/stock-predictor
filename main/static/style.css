@@ -1,8 +1,8 @@
 :root {
-    --bg: #03346E;
-    --bg_bright: #044595;
-    --navbar: #021526; 
-    --text: #E2E2B6;
+    --bg: #365486;
+    --bg_bright: #7fc7d950;
+    --navbar: #0F1035; 
+    --text: #DCF2F1;
 }
 
 /* overriding bootstrap btns: */
@@ -25,19 +25,11 @@ html {
     color: var(--text);
     border-radius: 10px;
     margin-left: 10px;
-    background: radial-gradient(
-        var(--bg) 30%, 
-        var(--navbar) 70%
-    );
 }
 
 #main_site_buttons:hover {
     transform:scale(1.08);
     transition: 0.4s;
-    background: radial-gradient(
-        var(--bg_bright) 30%, 
-        var(--navbar) 70%
-    );
 }
 
 #body {
@@ -72,6 +64,17 @@ a, p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, label {
 #logo:hover {
     color: #97977a;
     transition: 0.4s;
+}
+
+footer {
+    background-color: var(--bg_bright);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
 }
 
 #table_cell_centered {
