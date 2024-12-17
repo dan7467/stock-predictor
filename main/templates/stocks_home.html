@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}i-Stocks | Stocks{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.1.2/chart.umd.js"></script>
     <style>
 .tiles_container {
     margin:50px auto 0 auto;
@@ -26,7 +31,7 @@
     overflow:hidden;
     color:white;
 }
-.tile img {
+.tile canvas {
     height:100%;
     width:100%;
     position:absolute;
@@ -91,7 +96,6 @@
 </head>
 
 <script>
-    // TO-DO: Tile 'quick peek' to stocks
     let i = 0;
     let j = 0;
     let username;
@@ -150,23 +154,22 @@
 <div class="tiles_container">
     {% if request.user.my_stocks.1 %}
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <img src='/static/empty_tile.png'/>
             <div class="text">
             <h1><b>{{ request.user.my_stocks.0 }}</b></h1>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
+            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
         </div>
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.1 }}')"> 
-            <img src='/static/empty_tile.png'/>
             <div class="text">
             <h1><b>{{ request.user.my_stocks.1 }}</b></h1>
             <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
             </div>
+            <canvas id="barChart_{{ request.user.my_stocks.1 }}" width="380" height="380"></canvas>
         </div>
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <img src='/static/empty_tile.png'/>
             <div class="text">
             <h1><b>...</b></h1>
             <h2 class="animate-text">My Stocks</h2>
@@ -174,22 +177,21 @@
             </div>
         </div>
     {% else %}
-        <div class="tile" style="visibility: hidden;" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <img src='/static/empty_tile.png'/>
+        <div class="tile" style="visibility: hidden;"> 
             <div class="text">
-            <h1><b>{{ request.user.my_stocks.0 }}</b></h1>
-                    <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
-            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
+            <h1><b>Hidden tile, only for spacing</b></h1>
+                    <h2 class="animate-text">Hidden tile, only for spacing</h2>
+            <p class="animate-text"></p>
             </div>
-            </div>
+        </div>
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <img src='/static/empty_tile.png'/>
             <div class="text">
             <h1><b>{{ request.user.my_stocks.0 }}</b></h1>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
-            </div>
+            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+        </div>
     {% endif %}
 </div>  
 {% else %}
@@ -219,6 +221,9 @@
         </tr>
     <table>
 </div>
+
+{% load static %}
+<script src="{% static 'stocks_home.js' %}" type="text/javascript"></script>
 
 </body>
 {% endblock %}

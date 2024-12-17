@@ -62,7 +62,6 @@
                             {% endfor %}
                             <script>
                                 {% if chosen_stock_name %}
-                                    console.log(' received: {{chosen_stock_name}}');
                                     document.getElementById('stock_sym').value = '{{ chosen_stock_name }}';
                                 {% else %}
                                     // choose a stock from 'My Stocks' randomly
