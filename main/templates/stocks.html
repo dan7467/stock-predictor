@@ -60,6 +60,15 @@
                             {% for my_stock in my_stocks %}
                                 <option value="{{ my_stock }}">
                             {% endfor %}
+                            <script>
+                                // TO-DO: create a tile-layout page when 'Stocks' page is entered
+                                let my_stocks_unprocessed = '{{ my_stocks }}'.split('&#x27;'); // e.g. 0:"[", 1:"MSFT", 2:", ", 3:"AAPL", 4:"]"
+                                let my_stocks_processed = [];
+                                for (let i = 1; i < my_stocks_unprocessed.length; i += 2) { // 
+                                    my_stocks_processed.push(my_stocks_unprocessed[i]);
+                                }
+                                document.getElementById('stock_sym').value = my_stocks_processed[Math.floor(Math.random() * (my_stocks_processed.length))];
+                            </script>
                         {% endif %}
                     </datalist>
                 </div>

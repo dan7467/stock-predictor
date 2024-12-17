@@ -664,4 +664,5 @@ function formatNumToFixed(num, decimals){
             alert('Error: No stock symbol input');
         }
     }
+    autoDate('182');
 

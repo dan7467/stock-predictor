@@ -1,3 +1,4 @@
+        // TO-DO: create 'My Coins' functionality for 'My Profile', and to be presented (on the side) when you enter 'Crypto'
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
         document.title = `i-Stocks | ${coin_name.charAt(0).toUpperCase() + coin_name.substring(1)} Live Graph`;
