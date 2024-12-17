@@ -14,7 +14,6 @@ from . import notifications, input_sanitizer
 
 stock_data_handler = StockData()
 
-# TO-DO: add stock and crypto 'peek' tiles to homepage
 def home(request):
     return render(request, 'home.html')
 
@@ -52,19 +51,19 @@ def crypto_live(request):
         if len(result) == 0 or not search_input:
             return render(request, 'crypto_live.html', {"search_results": '0'})
         return render(request, 'crypto_live.html', {"search_results": ','.join(result)})
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     return render(request, 'crypto_live.html')
 
 def crypto_live_plotter(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     return render(request, 'crypto_live_plotter.html')
 
 def home_members(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     return render(request, 'home.html')
 
 def about_members(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     return render(request, 'about.html')
 
 @login_required
@@ -74,7 +73,7 @@ def log_out(request):
 
 @login_required
 @csrf_exempt
-@require_http_methods(["POST"])  # <<-- TO-DO: replace these http requests' POST with GET
+@require_http_methods(["POST"])  # TO-DO (nice to have): change this 'POST' into a 'GET'
 def get_crypto_coin_list(request):
     body = json.loads(request.body)
     page_num = body.get('page_number')
@@ -140,9 +139,8 @@ def log_in(request):
 
 @login_required
 def my_profile(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     if request.method == 'POST':
-        # TO-DO: link the stock's button to Stocks page (initialized with the chosen stock)
         if request.POST.get('_method', False) == 'DELETE':
             stock_symbol = request.POST.get('_stock_sym', False)
             if input_sanitizer.is_sanitized_stock_symbol(stock_symbol):
@@ -178,7 +176,7 @@ def get_stock_data(request):
 
 @login_required
 def updates(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     profile = CustomUser.objects.get(username=request.user.username)
     if request.method == 'POST':
         stock_symbol = request.POST.get('stock_sym', False)     
@@ -226,7 +224,7 @@ def updates(request):
 @csrf_exempt
 @require_http_methods(["POST", "GET"])
 def stocks(request):
-    last_action_timestamp_update(request)
+    # last_action_timestamp_update(request)
     profile = CustomUser.objects.get(username=request.user.username)   
     if request.method == 'POST':
         if request.POST.get('_method') == 'PATCH':

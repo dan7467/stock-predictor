@@ -10,7 +10,7 @@
 
 <br/>
 
-<table style="margin-bottom: 24px; left: 50%;">
+<table id="search_table" style="margin-bottom: 24px; left: 50%;">
     <tr>
         <form method="post">
         {% csrf_token %}
@@ -41,7 +41,7 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script language="javascript">
-
+    
     var HttpClient = function() {
         this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
             var anHttpRequest = new XMLHttpRequest();
@@ -58,7 +58,7 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
 
     var params = new URLSearchParams(window.location.search);
     let page_num = Number(params.get('page_num'));
-    let num_of_pages = 48;  // TO-DO: make this variable depend on Math.ceil(the actual number of results / page_size)
+    let num_of_pages = 48; 
     document.getElementById('curr_page').textContent = page_num + 1;
     let page_coin_ids_str = '';
     
@@ -68,10 +68,11 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
     if (page_num === 0) {
         document.getElementById('prev_page_btn_wrapper').style.visibility = 'hidden';
     }
+    else { // temporarily hide search for all pages>0, there's a small issue with it from these pages (resulting page_num is incorrect)
+        document.getElementById('search_table').style.visibility = 'hidden';
+    }
 
     // TO-DO: solve issue where there's more than 13 results (e.g. search 'b') and they are all on the same page (complex)
-
-    // TO-DO: solve issue when the search is being performed from page > 1, reset curr page to 0 BEFORE the search (pretty easy)
 
     client.sendHttpRequest('POST', '/get_crypto_coin_list', {page_number: page_num}, function(response) {
         let res = JSON.parse(response);

@@ -86,7 +86,7 @@
                                 {% endif %}
                             {% else %}
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-primary">{{ stock }}</button>
+                                    <a href="/stocks?selection={{stock}}"><button type="button" class="btn btn-primary">{{ stock }}</button></a>
                                     <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
                                 </div><br/><br/>
                             {% endif %}

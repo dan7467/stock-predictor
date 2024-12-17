@@ -73,6 +73,11 @@
                                     }
                                     document.getElementById('stock_sym').value = my_stocks_processed[Math.floor(Math.random() * (my_stocks_processed.length))];
                                 {% endif %}
+                                var params = new URLSearchParams(window.location.search);
+                                const redirect_from_my_profile_selection = params.get('selection', false);
+                                if (redirect_from_my_profile_selection) {
+                                    document.getElementById('stock_sym').value = redirect_from_my_profile_selection;
+                                }
                             </script>
                         {% endif %}
                     </datalist>
