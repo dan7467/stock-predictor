@@ -44,7 +44,7 @@ def crypto_live(request):
             return render(request, 'crypto_live.html', {"search_results": '0'})
         matched_coins = (
             CryptoCoinNames.objects
-            .filter(coin_name__iregex=rf"^{search_input}")  # Matches at the start of the string
+            .filter(coin_name__iregex=rf"{search_input}")
             .order_by('coin_name')  # Limit to 10 results for efficiency
         )
         result = list(matched_coins.values_list('coin_name', flat=True))
@@ -94,11 +94,6 @@ def get_crypto_coin_list(request):
     coins_per_page = 13
     offset = page_num * coins_per_page
     crypto_coins = list(CryptoCoinNames.objects.order_by('id')[offset:offset + coins_per_page].values_list('coin_name', flat=True))
-    # This below, is currently canceled since the amount of http requests caused the host to think it's a DoS attack...
-    # It is too bad they don't have an endpoint for multiple coins, from what I have seen, so it's 1 request, instead of 13
-    # coins_last_prices = []
-    # for coin_id in crypto_coins:
-    #     coins_last_prices.append(requests.get(f'https://api.coincap.io/v2/assets/{coin_id}').json()['data']['priceUsd'])
     try:
         return JsonResponse({"status": "success", "coin_list": crypto_coins})
     except Exception as e:
