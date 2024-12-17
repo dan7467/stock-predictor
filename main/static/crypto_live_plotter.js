@@ -1,6 +1,7 @@
         // TO-DO: create 'My Coins' functionality for 'My Profile', and to be presented (on the side) when you enter 'Crypto'
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
+        const from_page_num = params.get('from_page_num');
         document.title = `i-Stocks | ${coin_name.charAt(0).toUpperCase() + coin_name.substring(1)} Live Graph`;
         const coin_recent_history = JSON.parse(params.get('last_data'));
         // console.log(coin_recent_history); // [[1734123060388,"3921.60"],[1734123062128,"3921.59"]]
@@ -20,6 +21,9 @@
         }
         Date.prototype.timeNow = function () {
             return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+        }
+        function setBackButton() {
+            document.getElementById('back_to_crypto_menu_btn').setAttribute('href', '/crypto_live?page_num='+from_page_num);
         }
         function getCookie(cname) {
             let ca = decodeURIComponent(document.cookie).split(';');
@@ -43,6 +47,7 @@
         }
     
         document.addEventListener("DOMContentLoaded", function () {
+            setBackButton();
             let ctx = document.getElementById('barChart').getContext('2d');
             const config = {
                 type: 'line',

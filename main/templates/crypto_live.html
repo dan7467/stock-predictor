@@ -106,7 +106,7 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
                     <td><h5 id="${page_coin_ids_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h5></td>
                     <td id="small_table_cell">
                         <a id="${page_coin_ids_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${page_coin_ids_list[i]}&last_data=[]" style="text-decoration:none;">
-                            <button class="btn btn-primary" id="${page_coin_ids_list[i]}_live_plot_btn">Live graph</button>
+                            <button class="btn btn-primary">Live graph</button>
                         </a>
                     </td>
                     </tr>
@@ -126,7 +126,7 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
                     coin_price_buffer[coin_symbol].push([Date.now(), data[coin_symbol]]);
                 }
                 document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
-                document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/crypto_live_plotter?requested_coin=${coin_symbol}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
+                document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/crypto_live_plotter?requested_coin=${coin_symbol}&from_page_num=${page_num}&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
             }
         };
         ws.onerror = (error) => {

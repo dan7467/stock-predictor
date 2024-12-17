@@ -25,10 +25,24 @@ def careers(request):
     return render(request, 'careers.html')
 
 @login_required
+@require_http_methods(["GET", "POST"])
+def stocks_home(request):
+    if request.method == 'POST':
+        if request.POST.get('_method', False) and request.POST.get('_method') == 'PATCH':
+            return stocks(request)
+        else:
+            ticker = request.POST.get('search_input_field', False).upper()
+        if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker) and stock_data_handler.check_if_symbol_exists(ticker):
+            return render(request, 'stocks.html', {'chosen_stock_name': ticker})
+    return render(request, 'stocks_home.html')
+
+@login_required
 @require_http_methods(["POST", "GET"])
 def crypto_live(request):
     if request.method == 'POST':  # search stock name or symbol
         search_input = request.POST.get('search_input_field', False).strip()
+        if not input_sanitizer.is_sanitized_stock_symbol(search_input):
+            return render(request, 'crypto_live.html', {"search_results": '0'})
         matched_coins = (
             CryptoCoinNames.objects
             .filter(coin_name__iregex=rf"^{search_input}")  # Matches at the start of the string
@@ -128,6 +142,7 @@ def log_in(request):
 def my_profile(request):
     last_action_timestamp_update(request)
     if request.method == 'POST':
+        # TO-DO: link the stock's button to Stocks page (initialized with the chosen stock)
         if request.POST.get('_method', False) == 'DELETE':
             stock_symbol = request.POST.get('_stock_sym', False)
             if input_sanitizer.is_sanitized_stock_symbol(stock_symbol):

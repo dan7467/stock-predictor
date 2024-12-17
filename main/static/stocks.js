@@ -661,8 +661,13 @@ function formatNumToFixed(num, decimals){
             });
         } else {
             document.getElementById('graph_loader').style.visibility = 'hidden';
-            alert('Error: No stock symbol input');
+            alert('Error: No stock symbol input, or maybe the stock chosen does not exist.');
         }
     }
+
+    // TO-DO: fix 'Save Stock' issue (CSRF invalidated)
+
     autoDate('182');
+
+    
 
