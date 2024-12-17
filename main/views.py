@@ -10,7 +10,7 @@ from .models import CustomUser, CryptoCoinNames
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json, requests
-from . import notifications, input_sanitizer
+from . import notifications, input_sanitizer, crypto_handler
 
 stock_data_handler = StockData()
 
@@ -56,6 +56,27 @@ def crypto_live(request):
 
 def crypto_live_plotter(request):
     # last_action_timestamp_update(request)
+    profile = CustomUser.objects.get(username=request.user.username)   
+    print('a')
+    if request.method == 'POST':
+        print('b')
+        if request.POST.get('_method') == 'SAVE':
+            print('c')
+            coin_symbol = request.POST.get('_symbol', False)      
+            if input_sanitizer.is_sanitized_stock_symbol(coin_symbol):   
+                print('d')
+                if coin_symbol and coin_symbol not in profile.my_coins and crypto_handler.check_if_symbol_exists(coin_symbol):
+                    print('e')
+                    try:
+                        print('f')
+                        profile.my_coins.append(coin_symbol)
+                        profile.save()
+                        print('F')
+                        messages.success(request, f"Coin {coin_symbol} added to 'My Crypto Coins'!")
+                    except Exception as e:
+                        messages.error(request, f"Could not update coin: {e}")
+                else:
+                    messages.error(request, 'No coin symbol was entered!')
     return render(request, 'crypto_live_plotter.html')
 
 def home_members(request):
@@ -153,6 +174,18 @@ def my_profile(request):
                         return render(request, 'my_profile.html', {'deleted': stock_symbol})
                     except Exception as e:
                         messages.error(request, f"Could not update stock: {e}")
+        elif request.POST.get('_method', False) == 'DELETE_COIN':
+            coin_symbol = request.POST.get('_coin_sym', False)
+            if input_sanitizer.is_sanitized_stock_symbol(coin_symbol):
+                if coin_symbol:
+                    profile = CustomUser.objects.get(username=request.user.username)
+                    try:
+                        profile.my_coins.remove(coin_symbol)
+                        profile.save()
+                        messages.success(request, f"Coin {coin_symbol} removed from 'My Crypto Coins'")
+                        return render(request, 'my_profile.html', {'deleted': coin_symbol})
+                    except Exception as e:
+                        messages.error(request, f"Could not update coin: {e}")
     return render(request, 'my_profile.html')
 
 @login_required

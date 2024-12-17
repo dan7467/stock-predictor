@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}i-Stocks | My Profile{% endblock %}</title>
 </head>
-
+<br/><br/>
 <h2>My Profile</h2>
 
 <br/>
@@ -96,6 +96,46 @@
 
             </tr>
 
+            <tr>
+
+                <td id="small_table_cell">
+                    
+                    <b>
+
+                        My Crypto Coins
+
+                    </b>
+
+                </td>
+
+                <td>
+
+                    <br/>
+                    <form method="post" class="forms">
+                        <input type="hidden" id="_method" name="_method" value="DELETE_COIN">
+                        <input type="hidden" id="_coin_sym" name="_coin_sym">
+                        {% csrf_token %}
+                        {% for coin in user.my_coins %}
+                            {% if deleted %}
+                                {% if deleted == coin %}
+                                {% else %}
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-primary">{{ coin }}</button>
+                                    <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                </div><br/><br/>
+                                {% endif %}
+                            {% else %}
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/crypto_live_plotter/?requested_coin={{coin}}&from_page_num=0"><button type="button" class="btn btn-primary">{{ coin }}</button></a>
+                                    <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                </div><br/><br/>
+                            {% endif %}
+                        {% endfor %}
+                    </form>
+                </td>
+
+            </tr>
+
         </table>
 
     {% else %}
@@ -112,6 +152,10 @@
         function remove_from_my_stocks(stock_sym) {
             document.getElementById('_stock_sym').value = stock_sym;
             document.getElementById('del_'+stock_sym+'_btn').innerHTML = 'Loading...';
+        }
+        function remove_from_my_coins(coin_sym) {
+            document.getElementById('_coin_sym').value = coin_sym;
+            document.getElementById('del_'+coin_sym+'_btn').innerHTML = 'Loading...';
         }
     </script>
 

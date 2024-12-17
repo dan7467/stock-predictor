@@ -106,7 +106,7 @@ Page <b><a id="curr_page"></a></b> (<a id="curr_num_of_pages"></a> Total)
                     <td id="small_table_cell"><b id="${page_coin_ids_list[i]}">${normalizeCoinName(page_coin_ids_list[i])}</b>:</td>
                     <td><h5 id="${page_coin_ids_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h5></td>
                     <td id="small_table_cell">
-                        <a id="${page_coin_ids_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${page_coin_ids_list[i]}&last_data=[]" style="text-decoration:none;">
+                        <a id="${page_coin_ids_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${page_coin_ids_list[i]}&from_page_num=${page_num}&last_data=[]" style="text-decoration:none;">
                             <button class="btn btn-primary">Live graph</button>
                         </a>
                     </td>

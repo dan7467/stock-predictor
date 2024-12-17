@@ -1,4 +1,3 @@
-        // TO-DO: create 'My Coins' functionality for 'My Profile', and to be presented (on the side) when you enter 'Crypto'
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
         const from_page_num = params.get('from_page_num');
@@ -38,6 +37,9 @@
                 }
             }
             return "";
+        }
+        function update_name() {
+            document.getElementById('_symbol').value = coin_name;
         }
 
         function setCookie(cname, cvalue, hours_to_expire) {

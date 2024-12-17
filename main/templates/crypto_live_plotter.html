@@ -23,9 +23,17 @@
     
     {% load static %}
     <script src="{% static 'crypto_live_plotter.js' %}" type="text/javascript"></script>
-    <a id="back_to_crypto_menu_btn">
-    <button class="btn btn-secondary"><b>Back to prices</b></button>
-    </a>
 
+    <br/>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="SAVE">
+        <input type="hidden" name="_symbol" id="_symbol" value="">
+        <button type="submit" onclick="update_name()" class="btn btn-primary"><b>Save Coin</b></button>
+    </form>
+    <br/>
+    <a id="back_to_crypto_menu_btn">
+        <button class="btn btn-secondary">Back to prices</button>
+    </a>
 </body>
 {% endblock %}
