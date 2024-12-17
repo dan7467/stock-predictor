@@ -95,6 +95,8 @@
                     }
                 }
             };
+
+            Chart.defaults.color = "#fff";
     
             let priceChart = new Chart(ctx, config);
     

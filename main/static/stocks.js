@@ -378,6 +378,8 @@ function formatNumToFixed(num, decimals){
         }
     
     }
+
+    Chart.defaults.color = "#fff";
     
     const defaults = chart_js.Chart.defaults;
     
@@ -499,9 +501,10 @@ function formatNumToFixed(num, decimals){
 
     [...document.getElementsByTagName('select')].forEach(element => element.addEventListener('change', update));
 
-    function refreshStockData(new_stock_data, stock_symbol) {
+    function refreshStockData(new_stock_data, stock_sym) {
         let res = JSON.parse(new_stock_data);
         let parsed_data = JSON.parse(res['data']);
+        let stock_symbol = stock_sym.toUpperCase();
         if (
             res['status'] !== 'success' || 
             !(`('Open', '${stock_symbol}')` in parsed_data) || 
@@ -538,6 +541,7 @@ function formatNumToFixed(num, decimals){
             }
             update();
         }
+        document.title = `i-Stocks | ${stock_symbol} Stock`;
     }
 
     function is_number(s) {
