@@ -155,7 +155,7 @@
     {% if request.user.my_stocks.1 %}
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <div class="text">
-            <h1><b>{{ request.user.my_stocks.0 }}</b></h1>
+            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
@@ -163,7 +163,7 @@
         </div>
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.1 }}')"> 
             <div class="text">
-            <h1><b>{{ request.user.my_stocks.1 }}</b></h1>
+            <h1><b id="tile_1">{{ request.user.my_stocks.1 }}</b></h1>
             <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
             </div>
@@ -186,7 +186,7 @@
         </div>
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <div class="text">
-            <h1><b>{{ request.user.my_stocks.0 }}</b></h1>
+            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
