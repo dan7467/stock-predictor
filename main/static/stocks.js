@@ -667,7 +667,7 @@ function formatNumToFixed(num, decimals){
 
     // TO-DO: fix 'Save Stock' issue (CSRF invalidated)
 
-    autoDate('182');
+    autoDate('0');
 
     
 

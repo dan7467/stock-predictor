@@ -145,7 +145,7 @@
 <form method="post" id="tile_stock_chooser">
     {% csrf_token %}
 {% if request.user %}
-    {% if request.user.my_stocks %}
+{% if request.user.my_stocks %}
 <div class="tiles_container">
     {% if request.user.my_stocks.1 %}
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
@@ -164,7 +164,7 @@
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
             </div>
         </div>
-        <div class="tile"> 
+        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <img src='/static/empty_tile.png'/>
             <div class="text">
             <h1><b>...</b></h1>
@@ -172,7 +172,7 @@
             <p class="animate-text">Check out what's going on with the rest of your stocks!</p>
             </div>
         </div>
-        {% else %}
+    {% else %}
         <div class="tile" style="visibility: hidden;" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <img src='/static/empty_tile.png'/>
             <div class="text">
@@ -189,9 +189,14 @@
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
             </div>
-        {% endif %}
-</div>  
     {% endif %}
+</div>  
+{% else %}
+<div>
+    <br/><br/>
+        (No stocks saved yet!)
+</div>
+{% endif %}
 {% endif %}
 <input type="hidden" id="search_input_field" name="search_input_field">
 </form>
