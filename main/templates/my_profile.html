@@ -75,22 +75,26 @@
                         <input type="hidden" id="_method" name="_method" value="DELETE">
                         <input type="hidden" id="_stock_sym" name="_stock_sym">
                         {% csrf_token %}
-                        {% for stock in user.my_stocks %}
-                            {% if deleted %}
-                                {% if deleted == stock %}
+                        {% if user.my_stocks|length > 0 %}
+                            {% for stock in user.my_stocks %}
+                                {% if deleted %}
+                                    {% if deleted == stock %}
+                                    {% else %}
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-primary">{{ stock }}</button>
+                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                    </div><br/><br/>
+                                    {% endif %}
                                 {% else %}
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-primary">{{ stock }}</button>
-                                    <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
-                                </div><br/><br/>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/stocks?selection={{stock}}"><button type="button" class="btn btn-primary">{{ stock }}</button></a>
+                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                    </div><br/><br/>
                                 {% endif %}
-                            {% else %}
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/stocks?selection={{stock}}"><button type="button" class="btn btn-primary">{{ stock }}</button></a>
-                                    <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
-                                </div><br/><br/>
-                            {% endif %}
-                        {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <div>(No stocks saved yet!)<br/><br/></div>
+                        {% endif %}
                     </form>
                 </td>
 
@@ -115,22 +119,26 @@
                         <input type="hidden" id="_method" name="_method" value="DELETE_COIN">
                         <input type="hidden" id="_coin_sym" name="_coin_sym">
                         {% csrf_token %}
-                        {% for coin in user.my_coins %}
-                            {% if deleted %}
-                                {% if deleted == coin %}
+                        {% if user.my_coins|length > 0%}
+                            {% for coin in user.my_coins %}
+                                {% if deleted %}
+                                    {% if deleted == coin %}
+                                    {% else %}
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-primary">{{ coin }}</button>
+                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                    </div><br/><br/>
+                                    {% endif %}
                                 {% else %}
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-primary">{{ coin }}</button>
-                                    <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
-                                </div><br/><br/>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/crypto_live_plotter/?requested_coin={{coin}}&from_page_num=0"><button type="button" class="btn btn-primary">{{ coin }}</button></a>
+                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                    </div><br/><br/>
                                 {% endif %}
-                            {% else %}
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/crypto_live_plotter/?requested_coin={{coin}}&from_page_num=0"><button type="button" class="btn btn-primary">{{ coin }}</button></a>
-                                    <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
-                                </div><br/><br/>
-                            {% endif %}
-                        {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <div>(No coins saved yet!)<br/><br/></div>
+                        {% endif %}
                     </form>
                 </td>
 
@@ -149,6 +157,7 @@
     {% endif %}
 
     <script>
+        // TO-DO (small bug): when a user enters stock page from My Profile, search & save a new stock, after the save it returns to previous one
         function remove_from_my_stocks(stock_sym) {
             document.getElementById('_stock_sym').value = stock_sym;
             document.getElementById('del_'+stock_sym+'_btn').innerHTML = 'Loading...';

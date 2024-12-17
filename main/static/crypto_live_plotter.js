@@ -1,3 +1,4 @@
+        // TO-DO (small bug): after saving a coin from this page, the init data of the graph is still that of the crypto_live menu
         var params = new URLSearchParams(window.location.search);
         const coin_name = params.get('requested_coin');
         const from_page_num = params.get('from_page_num');

@@ -57,21 +57,14 @@ def crypto_live(request):
 def crypto_live_plotter(request):
     # last_action_timestamp_update(request)
     profile = CustomUser.objects.get(username=request.user.username)   
-    print('a')
     if request.method == 'POST':
-        print('b')
         if request.POST.get('_method') == 'SAVE':
-            print('c')
             coin_symbol = request.POST.get('_symbol', False)      
             if input_sanitizer.is_sanitized_stock_symbol(coin_symbol):   
-                print('d')
                 if coin_symbol and coin_symbol not in profile.my_coins and crypto_handler.check_if_symbol_exists(coin_symbol):
-                    print('e')
                     try:
-                        print('f')
                         profile.my_coins.append(coin_symbol)
                         profile.save()
-                        print('F')
                         messages.success(request, f"Coin {coin_symbol} added to 'My Crypto Coins'!")
                     except Exception as e:
                         messages.error(request, f"Could not update coin: {e}")
@@ -118,8 +111,18 @@ def get_current_stock_price(request):
     body = json.loads(request.body)
     ticker = body.get('stock_symbol')
     if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker):
-        res = stock_data_handler.fetch_current_day_stock_info(json.loads(request.body).get('stock_symbol'))
+        res = stock_data_handler.fetch_current_day_stock_info(ticker)
         return JsonResponse({"status": "success", "data": res.to_json()})
+    return JsonResponse({"status": "error", "message": "Invalid input."})
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def stock_exists(request):
+    body = json.loads(request.body)
+    ticker = body.get('stock_symbol')
+    if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker):
+        return JsonResponse({"status": "success", "result": stock_data_handler.check_if_symbol_exists(ticker)})
     return JsonResponse({"status": "error", "message": "Invalid input."})
 
 @login_required

@@ -23,9 +23,11 @@ var HttpClient = function() {
 
 var client = new HttpClient();
 
-function getStockData() {
+async function getStockData() {
     document.getElementById('graph_loader').style.visibility = 'visible';
     let sym = document.getElementById('stock_sym').value.toUpperCase();
+    await resetSymbolFieldIfStockDoesNotExists(sym);
+    sym = document.getElementById('stock_sym').value;
     let postpre_bool = document.getElementById('postpre_market_data_bool').checked;
     if (sym !== '') {
         const data = {
@@ -41,7 +43,7 @@ function getStockData() {
             document.getElementById('graph_loader').style.visibility = 'hidden';
         });
     } else {
-        alert('Error: No stock symbol input');
+        alert('Error: No stock symbol entered (or maybe the stock chosen does not exist).');
         document.getElementById('graph_loader').style.visibility = 'hidden';
     }
 }
@@ -403,8 +405,6 @@ function formatNumToFixed(num, decimals){
 
     getRandomData(initialDateStr);
 
-
-
     var chart = new Chart(ctx, {
     type: 'candlestick',
     data: {
@@ -631,9 +631,11 @@ function formatNumToFixed(num, decimals){
         }
         return new Date().subtractDays(daysToSubtract).toISOString().split('T')[0];
     }
-    function autoDate(days_ago) {
+    async function autoDate(days_ago) {
         document.getElementById('graph_loader').style.visibility = 'visible';
         let sym = document.getElementById('stock_sym').value.toUpperCase();
+        await resetSymbolFieldIfStockDoesNotExists(sym);
+        sym = document.getElementById('stock_sym').value;
         let date_start = document.getElementById('date_start');
         let date_end = document.getElementById('date_end');
         let all_data = false;
@@ -661,7 +663,24 @@ function formatNumToFixed(num, decimals){
             });
         } else {
             document.getElementById('graph_loader').style.visibility = 'hidden';
-            alert('Error: No stock symbol input, or maybe the stock chosen does not exist.');
+            alert('Error: No stock symbol entered (or maybe the stock chosen does not exist).');
+        }
+    }
+
+    async function resetSymbolFieldIfStockDoesNotExists(stock_sym) {
+        const data = { stock_symbol: stock_sym };
+        const response = await new Promise((resolve, reject) => {
+            client.sendHttpRequest('POST', '/stock_exists', data, function(response) {
+                try {
+                    resolve(response);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+        const res = JSON.parse(response);
+        if (!res['result']) {
+            document.getElementById('stock_sym').value = '';
         }
     }
 
