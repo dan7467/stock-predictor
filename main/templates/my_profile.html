@@ -80,15 +80,15 @@
                                 {% if deleted %}
                                     {% if deleted == stock %}
                                     {% else %}
-                                    <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-primary">{{ stock }}</button>
-                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                    <div>
+                                        <button type="button" class="btn btn-primary">{{ stock }}</button> &ensp;
+                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-outline-danger">Delete</button>
                                     </div><br/><br/>
                                     {% endif %}
                                 {% else %}
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="/stocks?selection={{stock}}"><button type="button" class="btn btn-primary">{{ stock }}</button></a>
-                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-danger">Delete</button>
+                                    <div>
+                                        <a href="/stocks?selection={{stock}}"><button type="button" class="btn btn-primary">{{ stock }}</button></a> &ensp;
+                                        <button type="submit" id="del_{{ stock }}_btn" onclick="remove_from_my_stocks('{{ stock }}')" class="btn btn-outline-danger">Delete</button>
                                     </div><br/><br/>
                                 {% endif %}
                             {% endfor %}
@@ -124,15 +124,15 @@
                                 {% if deleted %}
                                     {% if deleted == coin %}
                                     {% else %}
-                                    <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-primary">{{ coin }}</button>
-                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                    <div>
+                                        <button type="button" class="btn btn-primary">{{ coin }}</button> &ensp;
+                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-outline-danger">Delete</button>
                                     </div><br/><br/>
                                     {% endif %}
                                 {% else %}
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="/crypto_live_plotter/?requested_coin={{coin}}&from_page_num=0"><button type="button" class="btn btn-primary">{{ coin }}</button></a>
-                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-danger">Delete</button>
+                                    <div>
+                                        <a href="/crypto_live_plotter/?requested_coin={{coin}}&from_page_num=0"><button type="button" class="btn btn-primary">{{ coin }}</button></a> &ensp;
+                                        <button type="submit" id="del_{{ coin }}_btn" onclick="remove_from_my_coins('{{ coin }}')" class="btn btn-outline-danger">Delete</button>
                                     </div><br/><br/>
                                 {% endif %}
                             {% endfor %}

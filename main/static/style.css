@@ -5,18 +5,6 @@
     --text: #DCF2F1;
 }
 
-/* overriding bootstrap btns: */
-
-/* .btn.btn-primary,
-.btn.btn-primary:hover,
-.btn.btn-primary:focus,
-.btn.btn-primary:active,
-.btn.btn-primary.active {
-    color: #ffffff;
-    background-color: pink;
-    border-color: pink;
-} */
-
 html {
     background-color: var(--bg);
 }
@@ -71,15 +59,26 @@ nav {
     color: #97977a;
     transition: 0.3s;
 }
-
+body {
+    min-height: 100vh;
+    margin: 0;
+    position: relative;
+}
+body::after {
+    content: '';
+    display: block;
+    height: 100px;
+    /* Set same as footer's height */
+}
 footer {
     background-color: var(--bg_bright);
     padding: 14px;
-    position: fixed;
+    position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
     text-align: center;
+    height: 100px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.343) inset;
 }
 
@@ -101,21 +100,6 @@ footer {
     width: 200px;
     max-width: 200px;
     vertical-align: middle;
-}
-
-.btn.btn-danger {
-    background-color: #AE445A !important;
-    outline-color: #AE445A !important;
-}
-
-.btn.btn-danger:hover {
-    background-color: #7f2f3f !important;
-    outline-color: #7f2f3f !important;
-}
-
-.btn.btn-danger:active {
-    background-color: #6f2332 !important;
-    outline-color: #6f2332 !important;
 }
 
 .form-container {

@@ -40,13 +40,14 @@
 
             <div class="dropdown">
                 
-                    <button id="user_menu" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
+                    <button id="user_menu" type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                        <img src="/static/myprofile_icon.png" /> &nbsp;
                         {{ user.username }}
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="btn btn-outline-primary ms-2" href="{% url 'my_profile' %}">My Profile</a>
+                    <div class="dropdown-menu" style="background-color: #4d78a0 !important; text-align: center !important;">
+                        <a class="btn btn-primary ms-2" href="{% url 'my_profile' %}"><img src="/static/settings_icon.png" /> &nbsp; My Profile</a>
                         <br/><br/>
-                        <a class="btn btn-outline-danger ms-2" href="{% url 'log_out' %}">Logout</a>
+                        <a class="btn btn-danger ms-2" href="{% url 'log_out' %}">Logout</a>
                         
                     </div>
                 </div>
