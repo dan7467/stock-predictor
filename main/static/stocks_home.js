@@ -31,18 +31,35 @@
                     try {
                         let res = JSON.parse(response);
                         let parsed_data = JSON.parse(res['data']);
+                        document.getElementById('tile_'+i).innerHTML += `&emsp;&ensp; <b style="font-size: 14px;">${res['last_price'].toLocaleString()}</b>`;
                         for (let date in parsed_data["('Close', '"+stock_name+"')"]) {
                             graphs_data[i].push({x: date, y: parsed_data["('Close', '"+stock_name+"')"][date]});
                         }
                         updateGraph(stock_name, i);
                         resolve();
-                    } catch (error) {
+                    } catch (error) {   
                         console.error("Error parsing data for", stock_name, error);
                         reject(error);
                     }
                 });
             });
         }
+
+        let width, height, gradient;
+
+        function getGradient(ctx, chartArea) {
+            const chartWidth = chartArea.right - chartArea.left;
+            const chartHeight = chartArea.bottom - chartArea.top;
+            if (!gradient || width !== chartWidth || height !== chartHeight) {
+                width = chartWidth;
+                height = chartHeight;
+                gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(1, 'rgb(0, 123, 255)');
+                gradient.addColorStop(.25, 'rgba(0,128, 0, 0)');
+            }
+            return gradient;
+        }
+
         function updateGraph(stock_name, i) {
             let ctx = document.getElementById('barChart_'+stock_name).getContext('2d');
             const config = {
@@ -53,10 +70,22 @@
                         label: '',
                         data: graphs_data[i].map(point => point.y),
                         borderColor: '#007bff',
-                        borderWidth: 1.5,
-                        radius: 0, 
-                        fill: false, 
-                        tension: 0.2 
+                        pointBackgroundColor: 'transparent',
+                        pointBorderColor: 'transparent',
+                        borderJoinStyle: 'bevel',
+                        // the following 2 properties are the ones that need to be set
+                        fill: {
+                            value: -25,
+                        },
+                        backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) {
+                            // This case happens on initial chart load
+                            return;
+                        }
+                        return getGradient(ctx, chartArea);
+                        },
                     }]
                 },
                 options: { responsive: true, scales: { x: { display: false }, y: { display: false } } }

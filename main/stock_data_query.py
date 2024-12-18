@@ -55,6 +55,8 @@ class StockData:
         data = data.iloc[::interval]  # narrow down to fit resolution
         return data
             
+    def fetch_current_price(self, symbol):
+        return yf.Ticker(symbol).history(period='1d')['Close'][0]
     
     def calc_resolution(self, total_days):
         # for each key k, intervals[k] == approx k to fit in stock-market working hours
