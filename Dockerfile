@@ -1,22 +1,26 @@
-# Base Image
+# official Python slim image for a lighter build
 FROM python:3.10-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set working directory
+# working directory inside the container
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
+# system dependencies for PostgreSQL and other libraries
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc \
+    --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# requirements first for Docker caching optimization
+COPY requirements.txt requirements.txt
+
+# python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# copy rest of application code into the container
 COPY . .
 
-# Expose the application port
+# port exposure
 EXPOSE 8000
 
-# Run the application
-CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]
+# database migrations and Django development server start
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
