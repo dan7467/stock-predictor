@@ -14,6 +14,8 @@ from . import notifications, input_sanitizer, crypto_handler
 
 stock_data_handler = StockData()
 
+# TO-DO: unite "Stocks" and "Crypto" into a "Dashboard" page (with Dashboard layout)
+
 def home(request):
     return render(request, 'home.html')
 
