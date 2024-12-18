@@ -9,15 +9,11 @@ import pandas as pd
 import tensorflow as tf
 from datetime import datetime
 
-# configure tensorflow to use GPU
-sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
-
-
 ###################################################################################################################################################
 
 # # Local testing, model still not generalized:
 
-resolution = 100
+resolution = 150
 interval_vals = [390, 195, 78, 26, 13, 7, 1, 0.2, 0.14, 0.03, 0.01]
 interval_keys = ["1m", "2m", "5m", "15m", "30m", "1h", "1d", "5d", "1wk", "1mo", "3mo"]
         
@@ -31,7 +27,10 @@ def calc_resolution(total_days):
         
 ###################################################################################################################################################
 
-df = fetch_data('AAPL', '2010-01-01', '2024-12-12')  # train and fetch data
+# configure tensorflow to use GPU
+tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
+
+df = fetch_data('AAPL', '2004-01-01', '2024-12-12')  # train and fetch data
 
 data = df[['Close']]  # extract 'Close' data (price close) and convert to a DataFrame
 
@@ -56,15 +55,15 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-model.add(LSTM(64, return_sequences=False))
+model.add(LSTM(256, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(128, return_sequences=False))
 model.add(Dense(25))
 model.add(Dense(1))
 
 early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)  # if the loss function stops improving - early stop
 
 model.compile(optimizer='adam', loss='mean_squared_error')
-model.fit(x_train, y_train, batch_size=32, epochs=40, callbacks=[early_stop])
+model.fit(x_train, y_train, batch_size=32, epochs=60, callbacks=[early_stop])
 
 # predict the next 7% (future prices)
 future_predictions = []
