@@ -143,7 +143,7 @@
 
 
 
-<br/><br/>
+<br/>
 
 <code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
 
@@ -214,12 +214,12 @@
         <tr>
             <form method="post">
             {% csrf_token %}
-                <td><label>Search:&emsp;&emsp;&emsp;</label></td>
+                <td><label>Alternatively, you can search for stocks that you have not saved:&emsp;&emsp;&emsp;</label></td>
                 <td>
                     <input type="text" name="search_input_field" style="max-height:36px" placeholder="(e.g. 'AAPL', 'MSFT',...)">
                 </td>
                 <td>
-                    <button type="submit" class="btn btn-primary" style="max-height:36px">Search</button>
+                    &emsp;&emsp;<button type="submit" class="btn btn-primary" style="max-height:36px"><i class="fa fa-search"></i> &nbsp; Search</button>
                 </td>
                 <td><a id="search_results_status" style="visibility: hidden;"></a></td>
             </form>
@@ -234,7 +234,7 @@
 <div id="prices_container">
     <table class="table table-bordered">
         <thead>
-            <tr><td></td><td><u><b>My coins</b></u></td><td></td></tr>
+            <tr><td></td><td><code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s Coins</code></td><td></td></tr>
         </thead>
         <tbody id="prices_table_body">
         </tbody>
@@ -273,7 +273,7 @@
                 <td><h5 id="${coin_id_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h5></td>
                 <td id="small_table_cell">
                     <a id="${coin_id_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${coin_id_list[i]}&from_page_num=0&last_data=[]" style="text-decoration:none;">
-                        <button class="btn btn-primary">Live graph</button>
+                        <button class="btn btn-primary"><i class="fa-solid fa-play-circle"></i> &nbsp; Live graph</button>
                     </a>
                 </td>
                 </tr>

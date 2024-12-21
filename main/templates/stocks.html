@@ -34,19 +34,24 @@
             <option value="true" selected>Yes</option>
         </select>
     </div>
+
+    <table style="width: 100%;">
+        <tbody>
+            <tr>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('0')">Day×1</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('5')">Day×5</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('14')">Week×2</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('31')">Month×1</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('182')">Month×6</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('365')">Year×1</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('1825')">Year×5</button></td>
+                <td><button type="button" class="btn btn-secondary" onclick="autoDate('1826')">Max</button></td>
+            </tr>
+        </tbody>
+    </table>
     
     <table>
         <tbody>
-        <tr>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('0')">1 Day</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('5')">5 Days</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('14')">14 Days</button>&emsp;&emsp;&emsp;&emsp;
-                <button type="button" class="btn btn-secondary" onclick="autoDate('31')">1 Month</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('182')">6 Months</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('365')">1 Year</button>&emsp;&emsp;&emsp;&emsp;
-                <button type="button" class="btn btn-secondary" onclick="autoDate('1825')">5 Years</button></td>
-            <td><button type="button" class="btn btn-secondary" onclick="autoDate('1826')">Max</button></td>
-        </tr>
         <tr>
             <td>
                 <div id="table_cell_centered">
@@ -95,14 +100,14 @@
                 </div>
             </td>
             <td id="table_cell_centered">
-                <button type="button" onclick="getStockData()" class="btn btn-primary">Update</button>
+                <button type="button" onclick="getStockData()" class="btn btn-primary"><i class="fa fa-refresh"></i> &nbsp; Update</button>
             </td>
             <td id="table_cell_centered">
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="_method" value="PATCH">
                     <input type="hidden" name="_symbol" id="_symbol" value="">
-                    <button type="submit" onclick="update_name()" class="btn btn-primary">Save Stock</button>
+                    <button type="submit" onclick="update_name()" class="btn btn-primary"><i class="fa fa-heart"></i>Save</button>
                 </form>
             </td>
         </tr>
