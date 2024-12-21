@@ -156,7 +156,8 @@
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <div class="text">
             <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
-                    <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
+            <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>
             <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
@@ -165,6 +166,7 @@
             <div class="text">
             <h1><b id="tile_1">{{ request.user.my_stocks.1 }}</b></h1>
             <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.1 }}" style="opacity: 0.3;"></span>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
             </div>
             <canvas id="barChart_{{ request.user.my_stocks.1 }}" width="380" height="380"></canvas>
@@ -187,6 +189,7 @@
         <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
             <div class="text">
             <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
             <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
             </div>

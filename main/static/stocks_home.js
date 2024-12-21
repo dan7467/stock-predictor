@@ -91,6 +91,7 @@
                 options: { responsive: true, scales: { x: { display: false }, y: { display: false } } }
             };
             chart['chart_'+i] = new Chart(ctx, config);
+            document.getElementById('graph_loader_'+stock_name).style.visibility = 'hidden';
         }
         
         async function initMiniGraphs() {
