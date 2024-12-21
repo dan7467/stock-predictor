@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        .dashboard-container {
+            display: flex;
+        }
+        
+        .sidebar {
+            flex: 0 0 200px;
+        }
+        
+        .dashboard-content {
+            flex: 1; 
+            padding: 20px;
+            margin-left: 200px; 
+            min-height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="dashboard-container">
+
+        {% include 'sidebar.html' %}
+
+        <div class="dashboard-content">
+            {% block dashboard_content %}
+            {% endblock %}
+        </div>
+
+    </div>
+
+</body>
+{% endblock %}

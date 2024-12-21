@@ -25,6 +25,12 @@ def about(request):
 def careers(request):
     return render(request, 'careers.html')
 
+def dashboard(request):
+    return render(request, 'dashboard.html', {'page_title': 'Overview'})
+
+def dashboard_overview(request):
+    return render(request, 'dashboard_overview.html', {'page_title': 'Overview'})
+
 @login_required
 @require_http_methods(["GET", "POST"])
 def stocks_home(request):
