@@ -30,6 +30,7 @@ def calc_resolution(total_days):
 # configure tensorflow to use GPU
 tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(log_device_placement=True))
 
+# temporary !! generify this to any stock (after model is finished):
 df = fetch_data('AAPL', '2004-01-01', '2024-12-12')  # train and fetch data
 
 data = df[['Close']]  # extract 'Close' data (price close) and convert to a DataFrame
@@ -55,15 +56,15 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-model.add(LSTM(64, return_sequences=False))
+model.add(LSTM(256, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(128, return_sequences=False))
 model.add(Dense(25))
 model.add(Dense(1))
 
 early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)  # if the loss function stops improving - early stop
 
 model.compile(optimizer='adam', loss='mean_squared_error')
-model.fit(x_train, y_train, batch_size=32, epochs=40, callbacks=[early_stop])
+model.fit(x_train, y_train, batch_size=32, epochs=60, callbacks=[early_stop])
 
 # predict the next 7% (future prices)
 future_predictions = []
