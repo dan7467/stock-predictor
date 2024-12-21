@@ -1,7 +1,8 @@
 :root {
-    --bg: #365486;
-    --bg_bright: #4d78a0;
-    --navbar: #0F1035; 
+    --bg: #205295;
+    --bg_bright: #2C74B3;
+    --navbar: #0A2647; 
+    --navbar_darker: #144272; 
     --text: #DCF2F1;
 }
 

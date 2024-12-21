@@ -143,7 +143,7 @@
 
 
 
-<br/><br/><br/>
+<br/><br/>
 
 <code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
 
@@ -207,12 +207,14 @@
 <input type="hidden" id="search_input_field" name="search_input_field">
 </form>
 
-<div class="tiles_container">
+<br/>
+
+<div>
     <table>
         <tr>
             <form method="post">
             {% csrf_token %}
-                <td><label>Alternatively, you can search for other stocks that's not saved:&emsp;&emsp;&emsp;</label></td>
+                <td><label>Search:&emsp;&emsp;&emsp;</label></td>
                 <td>
                     <input type="text" name="search_input_field" style="max-height:36px" placeholder="(e.g. 'AAPL', 'MSFT',...)">
                 </td>
@@ -226,7 +228,86 @@
 </div>
 
 {% load static %}
-<script src="{% static 'stocks_home.js' %}" type="text/javascript"></script>
+<script src="{% static 'dashboard_overview.js' %}" type="text/javascript"></script>
+
+<br/>
+<div id="prices_container">
+    <table class="table table-bordered">
+        <thead>
+            <tr><td></td><td><u><b>My coins</b></u></td><td></td></tr>
+        </thead>
+        <tbody id="prices_table_body">
+        </tbody>
+    </table>
+    <div id="loading_status"><span class="loader"></span><br/><br/></div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script language="javascript">
+    
+    var HttpClient = function() {
+        this.sendHttpRequest = function(requestType, aUrl, data, aCallback) {
+            var anHttpRequest = new XMLHttpRequest();
+            anHttpRequest.onreadystatechange = function() {
+                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                    aCallback(anHttpRequest.responseText);
+            };
+            anHttpRequest.open(requestType, aUrl, true);
+            anHttpRequest.setRequestHeader("Content-Type", "application/json");
+            anHttpRequest.send(JSON.stringify(data)); 
+        };
+    };
+    var client = new HttpClient();
+
+    var params = new URLSearchParams(window.location.search);
+    let coin_ids_str = '{{ user.my_coins }}'.replaceAll('&#x27;', '').replaceAll(' ','');
+    coin_ids_str = coin_ids_str.substring(1, coin_ids_str.length - 1);
+    const ws = new WebSocket('wss://ws.coincap.io/prices?assets='+coin_ids_str);
+    let coin_price_buffer = {};
+    // init table
+    let coin_id_list = coin_ids_str.split(',');
+    for (let i in coin_id_list) {
+        document.getElementById('prices_table_body').innerHTML += `
+                <tr>
+                <td id="small_table_cell"><b id="${coin_id_list[i]}">${normalizeCoinName(coin_id_list[i])}</b>:</td>
+                <td><h5 id="${coin_id_list[i]}_price"><code style="font-size: 12px;"><span class="loader_mini"></span></code></h5></td>
+                <td id="small_table_cell">
+                    <a id="${coin_id_list[i]}_plotter_link" href="/crypto_live_plotter?requested_coin=${coin_id_list[i]}&from_page_num=0&last_data=[]" style="text-decoration:none;">
+                        <button class="btn btn-primary">Live graph</button>
+                    </a>
+                </td>
+                </tr>
+                `;
+    }
+    
+    document.getElementById('loading_status').innerHTML = '';
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        for (let coin_symbol in data) {
+            if (!(coin_symbol in coin_price_buffer)) {
+                coin_price_buffer[coin_symbol] = [[Date.now(), data[coin_symbol]]];
+            }
+            else {
+                document.getElementById(coin_symbol+'_price').style.color = data[coin_symbol] > coin_price_buffer[coin_symbol][coin_price_buffer[coin_symbol].length - 1][1] ? "#66ff33" : "#ff1a1a";
+                coin_price_buffer[coin_symbol].push([Date.now(), data[coin_symbol]]);
+            }
+            document.getElementById(coin_symbol+'_price').textContent = normalizePrice(data[coin_symbol]);
+            document.getElementById(coin_symbol+'_plotter_link').setAttribute('href', `/crypto_live_plotter?requested_coin=${coin_symbol}&from_page_num=0&last_data=${encodeURIComponent(JSON.stringify(coin_price_buffer[coin_symbol]))}`);
+        }
+    };
+    ws.onerror = (error) => {
+        console.error('(WS.OnError) WebSocket error:', error);
+    };
+
+    function normalizePrice(s) {
+        return Number(s).toLocaleString("en-US", {style: "currency", currency: "USD"});
+    }
+    
+    function normalizeCoinName(s) {
+        return (s.charAt(0)+'').toUpperCase() + s.substring(1);
+    }
+</script>
 
 </body>
 {% endblock %}
