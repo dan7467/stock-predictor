@@ -1,4 +1,232 @@
 {% extends 'dashboard.html' %}
 {% block dashboard_content %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}i-Stocks | Stocks{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.1.2/chart.umd.js"></script>
+    <style>
+.tiles_container {
+    margin:50px auto 0 auto;
+    width:100%;
+    display:flex;
+    align-items:space-around;
+    max-width:1200px;
+}
+.tile {
+    width:380px;
+    height:380px;
+    margin:10px;
+    background-color:#0F1035;
+    display:inline-block;
+    background-size:cover;
+    position:relative;
+    cursor:pointer;
+    transition: all 0.2s ease-out;
+    box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.44);
+    overflow:hidden;
+    color:white;
+}
+.tile canvas {
+    height:100%;
+    width:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:0;
+    transition: all 0.2s ease-out;
+    -webkit-mask-image:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+    mask-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+}
+.tile .text {
+    /*   z-index:99; */
+    position:absolute;
+    padding:30px;
+    height:calc(100% - 60px);
+}
+.tile h1 {
+    font-weight:300;
+    margin:0;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+}
+.tile h2 {
+    font-weight:100;
+    margin:20px 0 0 0;
+    font-style:italic;
+    transform: translateX(200px);
+}
+.tile p {
+    font-weight:300;
+    margin:20px 0 0 0;
+    line-height: 25px;
+/*   opacity:0; */
+    transform: translateX(-200px);
+    transition-delay: 0.1s;
+}
+.animate-text {
+    opacity:0;
+    transition: all 0.3s ease-in-out;
+}
+.tile:hover {
+    box-shadow: 0px 35px 77px -17px rgba(0,0,0,0.64);
+    transform:scale(1.05);
+}
+.tile:hover img {
+    opacity: 0.2;
+}
+.tile:hover .animate-text {
+    transform:translateX(0);
+    opacity:1;
+}
+.tile:hover span {
+    opacity:1;
+    transform:translateY(0px);
+}
+@media (max-width: 1000px) {
+    .tiles_container {
+    flex-direction: column;
+        width:400px;
+    }
+}
+</style>
+</head>
 
+<script>
+    let i = 0;
+    let j = 0;
+    let username;
+    const users_txt = [''];
+    const guests_txt = [`Welcome! Sign in now, for full functionality.`];
+    const speed = 30;
+    let chosen_text;
+    function setTypewriteText(isGuest) {
+        chosen_text = [users_txt, guests_txt][isGuest ? 1 : 0];
+        if (!(isGuest)) {
+            users_txt[0] = "{{ user.username }}'s Stocks";
+        }
+        typeWriter();
+    }
+    function typeWriter() {
+        let total_lines = chosen_text.length;
+        if (i < total_lines && j < chosen_text[i].length) {
+            document.getElementById("type_animation").innerHTML += chosen_text[i].charAt(j);
+            j++;
+            setTimeout(typeWriter, speed);
+        }
+        else if (i < total_lines) {
+            i++;
+            j = 0;
+            document.getElementById("type_animation").innerHTML += `<br/>`;
+            setTimeout(typeWriter, speed);
+        }
+        else {
+            let before_bold = document.getElementById("type_animation").innerHTML;
+            document.getElementById("type_animation").innerHTML = `<b>${before_bold.substring(0, before_bold.indexOf("'"))}</b>${before_bold.substring(before_bold.indexOf("'"))}`;
+        }
+    }
+    function onTileClick(chosen_stock_sym) {
+        document.getElementById('search_input_field').value = chosen_stock_sym.toUpperCase();
+        document.getElementById('tile_stock_chooser').submit();
+    }
+</script>
+
+
+{% if user.is_authenticated %}
+<body onload="setTypewriteText(false)">
+{% else %}
+<body onload="setTypewriteText(true)">
+{% endif %}
+
+
+
+<br/><br/><br/>
+
+<code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
+
+<form method="post" id="tile_stock_chooser">
+    {% csrf_token %}
+{% if request.user %}
+{% if request.user.my_stocks %}
+<div class="tiles_container">
+    {% if request.user.my_stocks.1 %}
+        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+            <div class="text">
+            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
+            <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
+            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
+            </div>
+            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+        </div>
+        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.1 }}')"> 
+            <div class="text">
+            <h1><b id="tile_1">{{ request.user.my_stocks.1 }}</b></h1>
+            <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.1 }}" style="opacity: 0.3;"></span>
+            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
+            </div>
+            <canvas id="barChart_{{ request.user.my_stocks.1 }}" width="380" height="380"></canvas>
+        </div>
+        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+            <div class="text">
+            <h1><b>...</b></h1>
+            <h2 class="animate-text">My Stocks</h2>
+            <p class="animate-text">Check out what's going on with the rest of your stocks!</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="tile" style="visibility: hidden;"> 
+            <div class="text">
+            <h1><b>Hidden tile, only for spacing</b></h1>
+                    <h2 class="animate-text">Hidden tile, only for spacing</h2>
+            <p class="animate-text"></p>
+            </div>
+        </div>
+        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+            <div class="text">
+            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
+            <span class="loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
+                    <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
+            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
+            </div>
+            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+        </div>
+    {% endif %}
+</div>  
+{% else %}
+<div>
+    <br/><br/>
+        (No stocks saved yet!)
+</div>
+{% endif %}
+{% endif %}
+<input type="hidden" id="search_input_field" name="search_input_field">
+</form>
+
+<div class="tiles_container">
+    <table>
+        <tr>
+            <form method="post">
+            {% csrf_token %}
+                <td><label>Alternatively, you can search for other stocks that's not saved:&emsp;&emsp;&emsp;</label></td>
+                <td>
+                    <input type="text" name="search_input_field" style="max-height:36px" placeholder="(e.g. 'AAPL', 'MSFT',...)">
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary" style="max-height:36px">Search</button>
+                </td>
+                <td><a id="search_results_status" style="visibility: hidden;"></a></td>
+            </form>
+        </tr>
+    <table>
+</div>
+
+{% load static %}
+<script src="{% static 'stocks_home.js' %}" type="text/javascript"></script>
+
+</body>
 {% endblock %}

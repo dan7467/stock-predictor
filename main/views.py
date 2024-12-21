@@ -25,15 +25,9 @@ def about(request):
 def careers(request):
     return render(request, 'careers.html')
 
-def dashboard(request):
-    return render(request, 'dashboard.html', {'page_title': 'Overview'})
-
-def dashboard_overview(request):
-    return render(request, 'dashboard_overview.html', {'page_title': 'Overview'})
-
 @login_required
 @require_http_methods(["GET", "POST"])
-def stocks_home(request):
+def dashboard(request):
     if request.method == 'POST':
         if request.POST.get('_method', False) and request.POST.get('_method') == 'PATCH':
             return stocks(request)
@@ -41,7 +35,7 @@ def stocks_home(request):
             ticker = request.POST.get('search_input_field', False).upper()
         if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker) and stock_data_handler.check_if_symbol_exists(ticker):
             return render(request, 'stocks.html', {'chosen_stock_name': ticker})
-    return render(request, 'stocks_home.html')
+    return render(request, 'dashboard_overview.html')
 
 @login_required
 @require_http_methods(["POST", "GET"])
