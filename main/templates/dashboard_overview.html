@@ -93,6 +93,36 @@
         width:400px;
     }
 }
+table {
+    background-color: var(--bg_bright_transparent);
+    border-radius: 10px;
+    padding: 10px;
+}
+.my_stocks_container, .my_news_container {
+    background-color: var(--bg_bright_transparent);
+    border-radius: 10px;
+    padding: 24px;
+    margin-right: 20px;
+}
+.my_news_container {
+    min-width: 280px;
+    overflow: hidden;
+    text-align: center;
+}
+.article_links {
+    color: white;
+    text-decoration: none;
+}
+.my_news_container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+}
+.my_news_container a:hover {
+    text-decoration: underline;
+}
 </style>
 </head>
 
@@ -142,101 +172,98 @@
 <body onload="setTypewriteText(true)">
 {% endif %}
 
+<div style="display: flex; align-items: left;">
 
-
-<br/>
-
-<code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
-
-<form method="post" id="tile_stock_chooser">
-    {% csrf_token %}
-{% if request.user %}
-{% if request.user.my_stocks %}
-<div class="tiles_container">
-    {% if request.user.my_stocks.1 %}
-        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <div class="text">
-            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
-            <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
-            <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
-            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
-            </div>
-            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
-        </div>
-        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.1 }}')"> 
-            <div class="text">
-            <h1><b id="tile_1">{{ request.user.my_stocks.1 }}</b></h1>
-            <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
-            <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.1 }}" style="opacity: 0.3;"></span>
-            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
-            </div>
-            <canvas id="barChart_{{ request.user.my_stocks.1 }}" width="380" height="380"></canvas>
-        </div>
-        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <div class="text">
-            <h1><b>...</b></h1>
-            <h2 class="animate-text">My Stocks</h2>
-            <p class="animate-text">Check out what's going on with the rest of your stocks!</p>
-            </div>
-        </div>
-    {% else %}
-        <div class="tile" style="visibility: hidden;"> 
-            <div class="text">
-            <h1><b>Hidden tile, only for spacing</b></h1>
-                    <h2 class="animate-text">Hidden tile, only for spacing</h2>
-            <p class="animate-text"></p>
-            </div>
-        </div>
-        <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
-            <div class="text">
-            <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
-            <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
+<div class="my_stocks_container">
+    <code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
+    <form method="post" id="tile_stock_chooser">
+        {% csrf_token %}
+    {% if request.user %}
+        {% if request.user.my_stocks %}
+        <div class="tiles_container">
+            {% if request.user.my_stocks.1 %}
+                <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+                    <div class="text">
+                    <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
                     <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
-            <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
-            </div>
-            <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+                    <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
+                    <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
+                    </div>
+                    <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+                </div>
+                <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.1 }}')"> 
+                    <div class="text">
+                    <h1><b id="tile_1">{{ request.user.my_stocks.1 }}</b></h1>
+                    <h2 class="animate-text">Updates on {{ request.user.my_stocks.1 }}</h2>
+                    <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.1 }}" style="opacity: 0.3;"></span>
+                    <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.1 }}.</p>
+                    </div>
+                    <canvas id="barChart_{{ request.user.my_stocks.1 }}" width="380" height="380"></canvas>
+                </div>
+                <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+                    <div class="text">
+                    <h1><b>...</b></h1>
+                    <h2 class="animate-text">My Stocks</h2>
+                    <p class="animate-text">Check out what's going on with the rest of your stocks!</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="tile" style="visibility: hidden;"> 
+                    <div class="text">
+                    <h1><b>Hidden tile, only for spacing</b></h1>
+                            <h2 class="animate-text">Hidden tile, only for spacing</h2>
+                    <p class="animate-text"></p>
+                    </div>
+                </div>
+                <div class="tile" onclick="onTileClick('{{ request.user.my_stocks.0 }}')"> 
+                    <div class="text">
+                    <h1><b id="tile_0">{{ request.user.my_stocks.0 }}</b></h1>
+                    <span class="stock_tile_loader" id="graph_loader_{{ request.user.my_stocks.0 }}" style="opacity: 0.3;"></span>
+                            <h2 class="animate-text">Updates on {{ request.user.my_stocks.0 }}</h2>
+                    <p class="animate-text">Click here to get updated on {{ request.user.my_stocks.0 }}.</p>
+                    </div>
+                    <canvas id="barChart_{{ request.user.my_stocks.0 }}" width="380" height="380"></canvas>
+                </div>
+            {% endif %}
+        </div>  
+        {% else %}
+        <div>
+            <br/><br/>
+                (No stocks saved yet!)
         </div>
+        {% endif %}
     {% endif %}
-</div>  
-{% else %}
-<div>
-    <br/><br/>
-        (No stocks saved yet!)
-</div>
-{% endif %}
-{% endif %}
-<input type="hidden" id="search_input_field" name="search_input_field">
-</form>
+    <input type="hidden" id="search_input_field" name="search_input_field">
+    </form>
 
-<br/>
+    <br/>
 
-<div>
-    <table>
-        <tr>
-            <form method="post">
-            {% csrf_token %}
-                <td><label>Alternatively, you can search for stocks that you have not saved:&emsp;&emsp;&emsp;</label></td>
-                <td>
-                    <input type="text" name="search_input_field" style="max-height:36px" placeholder="(e.g. 'AAPL', 'MSFT',...)">
-                </td>
-                <td>
-                    &emsp;&emsp;<button type="submit" class="btn btn-primary" style="max-height:36px"><i class="fa fa-search"></i> &nbsp; Search</button>
-                </td>
-                <td><a id="search_results_status" style="visibility: hidden;"></a></td>
-            </form>
-        </tr>
-    <table>
+    <div>
+        <table>
+            <tr>
+                <form method="post">
+                {% csrf_token %}
+                    <td><label>Alternatively, you can search for stocks that you have not saved:&emsp;&emsp;&emsp;</label></td>
+                    <td>
+                        <input type="text" name="search_input_field" style="max-height:36px" placeholder="(e.g. 'AAPL', 'MSFT',...)">
+                    </td>
+                    <td>
+                        &emsp;&emsp;<button type="submit" class="btn btn-primary" style="max-height:36px"><i class="fa fa-search"></i> &nbsp; Search</button>
+                    </td>
+                    <td><a id="search_results_status" style="visibility: hidden;"></a></td>
+                </form>
+            </tr>
+        <table>
+    </div>
 </div>
 
 {% load static %}
 <script src="{% static 'dashboard_overview.js' %}" type="text/javascript"></script>
-
 <br/>
+<code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s Coins</code>
+<br/><br/>
 <div id="prices_container">
     <table class="table table-bordered">
-        <thead>
-            <tr><td></td><td><code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s Coins</code></td><td></td></tr>
-        </thead>
         <tbody id="prices_table_body">
         </tbody>
     </table>
@@ -309,6 +336,25 @@
         return (s.charAt(0)+'').toUpperCase() + s.substring(1);
     }
 </script>
+</div>
 
+<div class="my_news_container">
+
+    <code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s News</code><br/><br/><br/><br/>
+
+    {% if last_week_news|length > 0 %}
+        {% for article in last_week_news %}
+            <img src="{{ article.image_url }}"/>
+            <b><u>{{ article.title }}</u></b> <br/>
+            {{ article.snippet }} <br/>
+        <b><a href="{{ article.url }}" class="article_links">
+            (Read more)
+        </a></b>
+        <br/><br/><br/><br/>
+        {% endfor %}
+    {% else %}
+        No news about your stocks...
+    {% endif %}
+</div>
 </body>
 {% endblock %}

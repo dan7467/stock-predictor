@@ -1,6 +1,7 @@
 :root {
     --bg: #205295;
     --bg_bright: #2C74B3;
+    --bg_bright_transparent: #2c74b382;
     --navbar: #0A2647; 
     --navbar_darker: #144272; 
     --text: #DCF2F1;

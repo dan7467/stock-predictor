@@ -10,7 +10,7 @@ from .models import CustomUser, CryptoCoinNames
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json, requests
-from . import notifications, input_sanitizer, crypto_handler
+from . import notifications, input_sanitizer, crypto_handler, news_handler
 
 stock_data_handler = StockData()
 
@@ -28,6 +28,7 @@ def careers(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def dashboard(request):
+    user_profile = CustomUser.objects.get(username=request.user.username)
     if request.method == 'POST':
         if request.POST.get('_method', False) and request.POST.get('_method') == 'PATCH':
             return stocks(request)
@@ -35,7 +36,7 @@ def dashboard(request):
             ticker = request.POST.get('search_input_field', False).upper()
         if ticker and input_sanitizer.is_sanitized_stock_symbol(ticker) and stock_data_handler.check_if_symbol_exists(ticker):
             return render(request, 'stocks.html', {'chosen_stock_name': ticker})
-    return render(request, 'dashboard_overview.html')
+    return render(request, 'dashboard_overview.html', {"last_week_news": news_handler.get_news_of_last_week(user_profile.my_stocks)})
 
 @login_required
 @require_http_methods(["POST", "GET"])
