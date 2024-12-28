@@ -105,7 +105,7 @@ table {
     margin-right: 20px;
 }
 .my_news_container {
-    min-width: 280px;
+    min-width: 300px;
     overflow: hidden;
     text-align: center;
 }
@@ -175,7 +175,7 @@ table {
 <div style="display: flex; align-items: left;">
 
 <div class="my_stocks_container">
-    <code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
+    <i class="fas fa-chart-line"></i>&ensp;<code id="type_animation" style="font-size: 28px; color: var(--text);"></code>
     <form method="post" id="tile_stock_chooser">
         {% csrf_token %}
     {% if request.user %}
@@ -236,7 +236,7 @@ table {
     <input type="hidden" id="search_input_field" name="search_input_field">
     </form>
 
-    <br/>
+    <br/><br/>
 
     <div>
         <table>
@@ -256,10 +256,11 @@ table {
         <table>
     </div>
 </div>
-
+<br/><br/>
 {% load static %}
 <script src="{% static 'dashboard_overview.js' %}" type="text/javascript"></script>
 <br/>
+<i class="fas fa-coins"></i>&ensp;
 <code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s Coins</code>
 <br/><br/>
 <div id="prices_container">
@@ -340,6 +341,7 @@ table {
 
 <div class="my_news_container">
 
+    <i class="fas fa-feed"></i> &ensp;
     <code style="font-size: 28px; color: var(--text);"><b>{{ user.username }}</b>'s News</code><br/><br/><br/><br/>
 
     {% if last_week_news|length > 0 %}
